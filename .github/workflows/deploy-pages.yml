@@ -1,0 +1,72 @@
+name: Deploy to GitHub Pages
+
+# Trigger: every push to main, or manually from the Actions tab
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for GitHub Pages deployment via OIDC
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one deployment runs at a time; cancel any in-progress run
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Flutter Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Add web platform support
+        # Creates web/ directory (index.html, manifest.json, icons/).
+        # Safe to run on an existing project — never overwrites lib/ or pubspec.yaml.
+        run: flutter create --platforms web --project-name convict_six_calisthenics_tracker .
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyse code
+        run: flutter analyze --no-fatal-warnings
+
+      - name: Build web (release)
+        # base-href must match the GitHub Pages subpath: /<repo-name>/
+        run: |
+          flutter build web \
+            --release \
+            --base-href /${{ github.event.repository.name }}/
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
