@@ -23,7 +23,7 @@ This file provides guidance for AI assistants (Claude Code, Copilot, etc.) worki
 | Unique IDs | **uuid ^4.4.0** — v4 UUIDs for session and set IDs |
 | Date formatting | **intl ^0.19.0** — `DateFormat` with `zh_TW` locale |
 | Testing | flutter_test + **mocktail ^1.0.4** |
-| CI | TBD |
+| CI / Deployment | **GitHub Actions** — build + deploy to GitHub Pages on push to `main` |
 
 **State management pattern:** `Notifier<T>` classes registered via `NotifierProvider`. All providers live in `lib/data/providers/app_providers.dart`. `SharedPreferences` is injected via a `Provider<SharedPreferences>` override at app startup.
 
@@ -103,6 +103,13 @@ flutter pub get
 # Run on connected device or emulator
 flutter run
 
+# Run in Chrome (web preview)
+flutter config --enable-web
+flutter run -d chrome
+
+# Run as local web server (open http://localhost:8080 in any browser)
+flutter run -d web-server --web-port 8080
+
 # Run all tests
 flutter test
 
@@ -124,9 +131,32 @@ flutter build apk --release
 # Build release iOS archive (requires macOS + Xcode)
 flutter build ios --release
 
+# Build web (for manual inspection of build/web/)
+flutter build web --release --base-href /ConvictSix-Calisthenics-Tracker/
+
 # Clean build artefacts
 flutter clean && flutter pub get
 ```
+
+### GitHub Pages (live web preview)
+
+A GitHub Actions workflow (`.github/workflows/deploy-pages.yml`) automatically builds and deploys the app to GitHub Pages on every push to `main`.
+
+**Live URL:** `https://seasu.github.io/ConvictSix-Calisthenics-Tracker/`
+
+**One-time setup** (do this once in the GitHub repo settings):
+1. Go to **Settings → Pages**
+2. Set **Source** to **GitHub Actions**
+3. Save — the next push to `main` will trigger a deployment
+
+The workflow:
+1. Installs Flutter stable
+2. Adds `web/` platform files via `flutter create --platforms web .`
+3. Runs `flutter analyze`
+4. Builds with `--base-href /ConvictSix-Calisthenics-Tracker/`
+5. Deploys `build/web/` to GitHub Pages
+
+All dependencies (`shared_preferences`, `uuid`, `intl`) are fully web-compatible. `HapticFeedback` silently no-ops on web.
 
 ### Before Committing
 
