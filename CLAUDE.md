@@ -67,8 +67,11 @@ ConvictSix-Calisthenics-Tracker/
 │   └── shared/
 │       ├── constants/
 │       │   └── exercises_data.dart       # Full 6×10 exercise definitions (Chinese + English)
+│       ├── theme/
+│       │   └── app_theme.dart            # Design tokens (kBg*, kPrimary, kTier*, kText*) + buildAppTheme()
 │       └── widgets/
-│           ├── exercise_progress_card.dart
+│           ├── exercise_progress_card.dart  # Full-width list card with tier colour + step dots
+│           ├── step_dots.dart               # StepDots (10-dot progress) + TierBadge widget
 │           └── set_log_tile.dart
 └── test/                                 # (to be populated)
     ├── unit/
@@ -150,7 +153,8 @@ flutter clean && flutter pub get
 - Keep widgets small and focused (single responsibility).
 - Extract reusable UI into `lib/shared/widgets/`.
 - Prefer `StatelessWidget` + external state management over `StatefulWidget` where practical.
-- Use `Theme.of(context)` and `TextTheme` for styling — no hard-coded colours or font sizes.
+- **Use design token constants** from `lib/shared/theme/app_theme.dart` (e.g. `kBgSurface`, `kPrimary`, `kTextSecondary`) for colours — do NOT use `Colors.white.withOpacity(…)` or arbitrary hex literals inline. `Theme.of(context)` is still used for component styles (buttons, chips) but raw colour values come from tokens.
+- The step-tier colour/label helpers (`stepTierColor(step)`, `stepTierLabel(step)`) live in `app_theme.dart` — use them whenever you need to colour-code a step number.
 
 ### State Management
 
@@ -182,6 +186,58 @@ flutter clean && flutter pub get
 - Widget tests live in `test/widget/` and test layout and user interactions.
 - Use `mocktail` (preferred) or `mockito` for mocking dependencies.
 - Test descriptions should read as sentences: `'returns empty list when no workouts are stored'`.
+
+---
+
+## Design System
+
+The app uses an **Athletic Minimal** visual language — dark backgrounds, high contrast, and colour that carries meaning.
+
+### Colour tokens (`lib/shared/theme/app_theme.dart`)
+
+| Token | Hex | Usage |
+|---|---|---|
+| `kBgBase` | `#111111` | Scaffold background |
+| `kBgSurface` | `#1C1C1C` | Card / container background |
+| `kBgSurface2` | `#252525` | Slightly elevated surface (inputs, quick-buttons) |
+| `kBgSurface3` | `#2E2E2E` | Highest elevation surface |
+| `kBorderSubtle` | `#2A2A2A` | Card borders (default, non-interactive) |
+| `kBorderDefault` | `#383838` | Interactive element borders |
+| `kPrimary` | `#FF5722` | Primary CTA, active elements, today badge |
+| `kPrimaryDim` | 15 % of primary | Focus overlay for sliders |
+| `kTierBeginner` | `#52C41A` | Steps 1–4 (綠 · 初學) |
+| `kTierMid` | `#FAC015` | Steps 5–7 (黃 · 中級) |
+| `kTierAdvanced` | `#FF5722` | Steps 8–10 (橙 · 進階) |
+| `kTextPrimary` | `#FFFFFF` | Primary text |
+| `kTextSecondary` | `#9E9E9E` | Secondary / meta text |
+| `kTextTertiary` | `#616161` | Placeholder, caption, disabled text |
+
+### Step-tier helpers
+
+```dart
+// Returns the tier colour for a step number (1–10)
+Color stepTierColor(int step)
+
+// Returns the tier label: '初學' | '中級' | '進階'
+String stepTierLabel(int step)
+```
+
+### Shared visual components
+
+| Widget | File | Description |
+|---|---|---|
+| `ExerciseProgressCard` | `shared/widgets/exercise_progress_card.dart` | Full-width list card: emoji icon box, name, step dots, tier badge, target |
+| `StepDots` | `shared/widgets/step_dots.dart` | Row of 10 colour-coded dots; active dot has glow |
+| `TierBadge` | `shared/widgets/step_dots.dart` | Coloured pill badge: 初學 / 中級 / 進階 |
+| `SetLogTile` | `shared/widgets/set_log_tile.dart` | Single logged-set row (set number + reps/hold) |
+
+### Workout quick-add UX
+
+The workout screen uses **quick-tap buttons** instead of a keyboard text field:
+- **Reps exercises:** `[5] [8] [10] [12] [15] [20] [自訂]`
+- **Hold exercises:** `[10s] [20s] [30s] [45s] [60s] [90s] [自訂]`
+- The button matching the step's **progression target** is highlighted in the tier colour.
+- "自訂" opens an inline text field for non-standard values.
 
 ---
 
