@@ -8,7 +8,7 @@ This file provides guidance for AI assistants (Claude Code, Copilot, etc.) worki
 
 **ConvictSix Calisthenics Tracker** is a cross-platform mobile (and optionally desktop/web) application built with Flutter/Dart. Its purpose is to help users track progress through a structured calisthenics programme (inspired by the "Convict Conditioning" / ConvictSix progression system), recording workouts, sets, reps, and advancement through exercise progressions.
 
-**Current state:** The repository was created with an initial commit containing only a Flutter `.gitignore` and a stub `README.md`. No application code exists yet. All foundational scaffolding is still to be written.
+**Current state:** MVP scaffolding is complete. All six exercises with ten progression steps each are defined. The app supports setting your current level per exercise, scheduling weekly training days, logging workout sets/reps, and reviewing session history. Platform-specific host projects (android/, ios/, etc.) still need to be generated via `flutter create .`.
 
 ---
 
@@ -16,50 +16,69 @@ This file provides guidance for AI assistants (Claude Code, Copilot, etc.) worki
 
 | Layer | Technology |
 |---|---|
-| UI / App framework | Flutter (Dart) |
-| Language | Dart (≥ 3.x recommended) |
-| State management | TBD — prefer Riverpod or BLoC when chosen |
-| Local persistence | TBD — prefer Hive, Isar, or `sqflite` |
-| Testing | Flutter test, Mockito / Mocktail |
+| UI / App framework | Flutter (Dart) — Material 3, dark theme |
+| Language | Dart ≥ 3.x |
+| State management | **flutter_riverpod ^2.5.1** — `Notifier` + `NotifierProvider` |
+| Local persistence | **shared_preferences ^2.3.2** — JSON-encoded models |
+| Unique IDs | **uuid ^4.4.0** — v4 UUIDs for session and set IDs |
+| Date formatting | **intl ^0.19.0** — `DateFormat` with `zh_TW` locale |
+| Testing | flutter_test + **mocktail ^1.0.4** |
 | CI | TBD |
 
-> When a dependency is chosen, record it here and in `pubspec.yaml`.
+**State management pattern:** `Notifier<T>` classes registered via `NotifierProvider`. All providers live in `lib/data/providers/app_providers.dart`. `SharedPreferences` is injected via a `Provider<SharedPreferences>` override at app startup.
+
+**Persistence strategy:** Models implement `toJson()`/`fromJson()` and are stored as JSON strings in `SharedPreferences`. No code generation is required.
 
 ---
 
 ## Repository Layout
 
-The expected standard Flutter layout once scaffolding is complete:
+Current actual layout:
 
 ```
 ConvictSix-Calisthenics-Tracker/
-├── CLAUDE.md                   # This file
-├── README.md                   # User-facing description
-├── pubspec.yaml                # Package manifest & dependencies
-├── pubspec.lock                # Locked dependency versions (commit this)
-├── analysis_options.yaml       # Dart analyser / linter rules
+├── CLAUDE.md
+├── README.md
+├── pubspec.yaml
+├── analysis_options.yaml
 ├── lib/
-│   ├── main.dart               # App entry point
-│   ├── app.dart                # Root widget / MaterialApp / routing
-│   ├── features/               # Feature-first organisation
-│   │   ├── workout/            # Logging workouts & sets
-│   │   ├── progression/        # Exercise progressions & step unlocks
-│   │   ├── history/            # Past workout history & charts
-│   │   └── settings/           # User preferences
-│   ├── shared/                 # Reusable widgets, utilities, constants
-│   └── data/                   # Repositories, data sources, models
-├── test/
-│   ├── unit/                   # Pure Dart unit tests
-│   ├── widget/                 # Flutter widget tests
-│   └── integration/            # End-to-end integration tests
-├── android/                    # Android host project
-├── ios/                        # iOS host project
-├── macos/                      # macOS host project (optional)
-├── web/                        # Web host project (optional)
-└── assets/                     # Images, fonts, JSON seed data
+│   ├── main.dart                         # App entry point; initialises SharedPreferences
+│   ├── app.dart                          # ConvictSixApp (MaterialApp) + MainNavigationScreen
+│   ├── data/
+│   │   ├── models/
+│   │   │   ├── exercise.dart             # ExerciseType enum, ExerciseStep, Exercise, StepStandard
+│   │   │   ├── user_progression.dart     # UserProgression (current step per exercise)
+│   │   │   ├── workout_session.dart      # WorkoutSession, WorkoutSet
+│   │   │   └── training_schedule.dart    # TrainingSchedule, DaySchedule
+│   │   ├── providers/
+│   │   │   └── app_providers.dart        # All Riverpod providers (progression, schedule, workout, history)
+│   │   └── repositories/
+│   │       ├── progression_repository.dart
+│   │       └── workout_repository.dart
+│   ├── features/
+│   │   ├── home/
+│   │   │   └── home_screen.dart          # Dashboard: six-exercise progress grid + today's plan
+│   │   ├── program_setup/
+│   │   │   └── program_setup_screen.dart # Set current step + configure weekly schedule
+│   │   ├── workout/
+│   │   │   └── workout_screen.dart       # Start/log/finish a workout session
+│   │   └── history/
+│   │       └── history_screen.dart       # Past sessions list with expandable detail
+│   └── shared/
+│       ├── constants/
+│       │   └── exercises_data.dart       # Full 6×10 exercise definitions (Chinese + English)
+│       └── widgets/
+│           ├── exercise_progress_card.dart
+│           └── set_log_tile.dart
+└── test/                                 # (to be populated)
+    ├── unit/
+    ├── widget/
+    └── integration/
 ```
 
-If the actual layout diverges from the above, update this section to match reality.
+> **Note:** Platform host projects (`android/`, `ios/`, etc.) are not yet present.
+> After cloning, run `flutter create . --project-name convict_six_calisthenics_tracker`
+> to generate them, then `flutter pub get`.
 
 ---
 
@@ -135,9 +154,11 @@ flutter clean && flutter pub get
 
 ### State Management
 
-- Adopt one state-management approach for the whole app (document the choice here once made).
-- Keep business logic out of widgets; widgets should only call methods and render state.
-- Isolate side effects (I/O, persistence) behind repository interfaces.
+- **Riverpod** is the chosen state management solution. Use `Notifier<T>` + `NotifierProvider`.
+- All providers are declared in `lib/data/providers/app_providers.dart`.
+- Keep business logic out of widgets; widgets call notifier methods and read state via `ref.watch`.
+- Isolate side effects (I/O, persistence) behind repository classes.
+- Inject `SharedPreferences` via `sharedPreferencesProvider` — never call `SharedPreferences.getInstance()` inside a provider or widget directly.
 
 ### Data Layer
 
@@ -190,11 +211,13 @@ Data sources (local DB, remote API, shared preferences)
 
 | Term | Meaning |
 |---|---|
-| **Exercise** | A specific movement (e.g., Push-up, Pull-up, Squat) |
-| **Step / Progression** | A difficulty tier within an exercise (e.g., Kneeling Push-up → Full Push-up → Uneven Push-up) |
-| **Set** | A single timed or counted effort within a workout session |
-| **Session / Workout** | A dated collection of sets across one or more exercises |
-| **Programme** | An ordered list of exercises and their progressions that the user works through |
+| **Exercise (招)** | One of the six movements: 伏地挺身, 深蹲, 引體向上, 舉腿, 橋式, 倒立推 |
+| **Step / 式** | A difficulty tier within an exercise, numbered 1–10. Each step has Beginner / Intermediate / Progression standards. |
+| **Progression standard** | The rep/set target that must be met to advance to the next step. |
+| **Set (組)** | A single counted effort (e.g., 20 reps) or timed hold (e.g., 60 s) within a workout. |
+| **Session / Workout** | A dated `WorkoutSession` containing one or more `WorkoutSet` entries. |
+| **Training Schedule** | `TrainingSchedule` — maps weekdays to a list of exercises to perform that day. |
+| **User Progression** | `UserProgression` — stores the user's current step (1–10) per exercise. |
 
 ---
 
