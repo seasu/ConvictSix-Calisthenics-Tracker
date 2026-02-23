@@ -22,7 +22,7 @@ class WorkoutSet {
 
   bool get isHold => holdSeconds > 0;
 
-  String get displayReps => isHold ? '${holdSeconds}秒' : '$reps下';
+  String get displayReps => isHold ? '$holdSeconds秒' : '$reps下';
 
   Map<String, dynamic> toJson() => {
         'id': id,

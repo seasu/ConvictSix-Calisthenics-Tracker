@@ -39,7 +39,7 @@ class ExerciseProgressCard extends StatelessWidget {
           color: kBgSurface,
           borderRadius: BorderRadius.circular(16),
           border: isScheduledToday
-              ? Border.all(color: kPrimary.withOpacity(0.7), width: 1)
+              ? Border.all(color: kPrimary.withValues(alpha: 0.7), width: 1)
               : Border.all(color: kBorderSubtle, width: 1),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
@@ -51,7 +51,7 @@ class ExerciseProgressCard extends StatelessWidget {
               width: 46,
               height: 46,
               decoration: BoxDecoration(
-                color: tierColor.withOpacity(0.12),
+                color: tierColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -86,7 +86,7 @@ class ExerciseProgressCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: kPrimary.withOpacity(0.15),
+                            color: kPrimary.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: const Text(
@@ -139,7 +139,7 @@ class ExerciseProgressCard extends StatelessWidget {
                   step.progression.display,
                   style: TextStyle(
                     fontSize: 11,
-                    color: tierColor.withOpacity(0.85),
+                    color: tierColor.withValues(alpha: 0.85),
                     fontWeight: FontWeight.w600,
                   ),
                 ),

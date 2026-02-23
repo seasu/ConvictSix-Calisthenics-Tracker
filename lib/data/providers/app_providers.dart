@@ -16,7 +16,7 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
   (_) => throw UnimplementedError('SharedPreferences not yet initialised'),
 );
 
-final _uuid = const Uuid();
+const _uuid = Uuid();
 
 // ─── Repositories ─────────────────────────────────────────────────────────────
 
