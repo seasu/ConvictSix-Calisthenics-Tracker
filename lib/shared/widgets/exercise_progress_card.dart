@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/exercise.dart';
 import '../../shared/constants/exercises_data.dart';
+import '../theme/app_theme.dart';
+import 'step_dots.dart';
 
-/// Compact card displayed on the Home screen showing one exercise's
-/// current step and a visual progress bar.
+/// Full-width list-style card showing one exercise's current progression.
+///
+/// Layout:
+///   [emoji box]  [name + step label]  [10-dot row]
+///                [step name]          [tier badge]
+///                                     [target label]
 class ExerciseProgressCard extends StatelessWidget {
   const ExerciseProgressCard({
     super.key,
@@ -23,111 +29,121 @@ class ExerciseProgressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final exercise = exerciseForType(type);
     final step = exercise.stepAt(currentStep);
-    final theme = Theme.of(context);
-    final progress = currentStep / 10.0;
+    final tierColor = stepTierColor(currentStep);
 
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: kBgSurface,
           borderRadius: BorderRadius.circular(16),
           border: isScheduledToday
-              ? Border.all(
-                  color: theme.colorScheme.primary,
-                  width: 1.5,
-                )
-              : null,
+              ? Border.all(color: kPrimary.withOpacity(0.7), width: 1)
+              : Border.all(color: kBorderSubtle, width: 1),
         ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Text(
+            // ── Emoji icon box ─────────────────────────────────────────────
+            Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: tierColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Text(
                   exercise.emoji,
                   style: const TextStyle(fontSize: 22),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    exercise.nameZh,
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                if (isScheduledToday)
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      '今日',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: theme.colorScheme.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
-            const SizedBox(height: 10),
-            // Step number badge + name
-            Row(
-              children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary,
-                    borderRadius: BorderRadius.circular(8),
+            const SizedBox(width: 14),
+            // ── Name + step info ───────────────────────────────────────────
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Exercise name + 今日 badge
+                  Row(
+                    children: [
+                      Text(
+                        exercise.nameZh,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: kTextPrimary,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                      if (isScheduledToday) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: kPrimary.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: const Text(
+                            '今日',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: kPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  child: Text(
-                    '第 $currentStep 式',
+                  const SizedBox(height: 2),
+                  // Step number + step name
+                  Text(
+                    '第 $currentStep 式 · ${step.nameZh}',
                     style: const TextStyle(
-                      color: Colors.white,
                       fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                      color: kTextSecondary,
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    step.nameZh,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: Colors.white70,
-                    ),
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  const SizedBox(height: 8),
+                  // 10-dot progress
+                  StepDots(currentStep: currentStep),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            // ── Right: tier + count + target ──────────────────────────────
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TierBadge(step: currentStep),
+                const SizedBox(height: 6),
+                Text(
+                  '$currentStep / 10',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: kTextTertiary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  step.progression.display,
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: tierColor.withOpacity(0.85),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
-            ),
-            const SizedBox(height: 10),
-            // Progress bar
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: Colors.white12,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  theme.colorScheme.primary,
-                ),
-                minHeight: 6,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              '$currentStep / 10',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: Colors.white38,
-              ),
             ),
           ],
         ),
