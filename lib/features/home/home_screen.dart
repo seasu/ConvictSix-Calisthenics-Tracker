@@ -187,9 +187,9 @@ class _ActiveSessionBanner extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: kPrimary.withOpacity(0.12),
+        color: kPrimary.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kPrimary.withOpacity(0.4)),
+        border: Border.all(color: kPrimary.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
@@ -197,7 +197,7 @@ class _ActiveSessionBanner extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: kPrimary.withOpacity(0.15),
+              color: kPrimary.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.fitness_center,

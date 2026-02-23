@@ -103,7 +103,7 @@ class _SessionCardState extends ConsumerState<_SessionCard> {
                     width: 48,
                     height: 52,
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withOpacity(0.15),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     alignment: Alignment.center,
@@ -291,7 +291,7 @@ class _ExerciseDetail extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.06),
+                  color: Colors.white.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(

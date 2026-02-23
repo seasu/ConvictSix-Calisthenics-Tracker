@@ -139,7 +139,7 @@ class _ExerciseStepCard extends ConsumerWidget {
               activeTrackColor: theme.colorScheme.primary,
               thumbColor: theme.colorScheme.primary,
               inactiveTrackColor: Colors.white12,
-              overlayColor: theme.colorScheme.primary.withOpacity(0.15),
+              overlayColor: theme.colorScheme.primary.withValues(alpha: 0.15),
               trackHeight: 4,
             ),
             child: Slider(
@@ -218,7 +218,7 @@ class _ProgressionStandard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
@@ -350,7 +350,7 @@ class _DayScheduleCardState extends ConsumerState<_DayScheduleCard> {
         borderRadius: BorderRadius.circular(14),
         border: isToday
             ? Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.5))
+                color: theme.colorScheme.primary.withValues(alpha: 0.5))
             : null,
       ),
       child: Column(
@@ -403,7 +403,7 @@ class _DayScheduleCardState extends ConsumerState<_DayScheduleCard> {
                                     horizontal: 6, vertical: 1),
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.primary
-                                      .withOpacity(0.2),
+                                      .withValues(alpha: 0.2),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
@@ -436,7 +436,7 @@ class _DayScheduleCardState extends ConsumerState<_DayScheduleCard> {
                   ),
                   Switch(
                     value: _isTrainingDay,
-                    activeColor: theme.colorScheme.primary,
+                    activeThumbColor: theme.colorScheme.primary,
                     onChanged: (val) {
                       if (val) {
                         ref.read(scheduleProvider.notifier).updateDay(
@@ -508,8 +508,8 @@ class _ExerciseSelector extends ConsumerWidget {
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
               color: isSelected
-                  ? theme.colorScheme.primary.withOpacity(0.2)
-                  : Colors.white.withOpacity(0.05),
+                  ? theme.colorScheme.primary.withValues(alpha: 0.2)
+                  : Colors.white.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
                 color: isSelected

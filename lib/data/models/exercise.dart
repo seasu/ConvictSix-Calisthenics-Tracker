@@ -76,8 +76,8 @@ class StepStandard {
   bool get isHold => holdSeconds > 0;
 
   String get display {
-    if (isHold) return '${sets}組 × ${holdSeconds}秒';
-    return '${sets}組 × ${reps}下';
+    if (isHold) return '$sets組 × $holdSeconds秒';
+    return '$sets組 × $reps下';
   }
 }
 

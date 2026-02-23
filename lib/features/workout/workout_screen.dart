@@ -103,7 +103,7 @@ class _PlanRow extends ConsumerWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: tierColor.withOpacity(0.12),
+              color: tierColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
@@ -395,7 +395,7 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: tierColor.withOpacity(0.12),
+                  color: tierColor.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Center(
@@ -457,10 +457,10 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: tierColor.withOpacity(0.12),
+                    color: tierColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: tierColor.withOpacity(0.35)),
+                        color: tierColor.withValues(alpha: 0.35)),
                   ),
                   child: Text(
                     '第${i + 1}組  ${s.displayReps}',
@@ -483,9 +483,9 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
           if (!_showCustomInput) ...[
             Row(
               children: [
-                Text(
+                const Text(
                   '快速記錄',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: kTextTertiary,
@@ -631,14 +631,14 @@ class _QuickButton extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           color: isTarget
-              ? tierColor.withOpacity(0.18)
+              ? tierColor.withValues(alpha: 0.18)
               : isSpecial
                   ? kBgSurface3
                   : kBgSurface2,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: isTarget
-                ? tierColor.withOpacity(0.6)
+                ? tierColor.withValues(alpha: 0.6)
                 : kBorderDefault,
             width: isTarget ? 1.5 : 1,
           ),

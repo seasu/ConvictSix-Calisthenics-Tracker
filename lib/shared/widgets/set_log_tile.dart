@@ -29,7 +29,7 @@ class SetLogTile extends StatelessWidget {
             width: 28,
             height: 28,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.2),
+              color: theme.colorScheme.primary.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
