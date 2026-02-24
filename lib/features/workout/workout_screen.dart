@@ -100,16 +100,22 @@ class _PlanRow extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: tierColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Center(
-              child: Text(exercise.emoji,
-                  style: const TextStyle(fontSize: 20)),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: SizedBox(
+              width: 50,
+              height: 50,
+              child: Image.asset(
+                'assets/images/exercises/${type.name}_${step.toString().padLeft(2, '0')}.jpg',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: tierColor.withValues(alpha: 0.12),
+                  child: Center(
+                    child: Text(exercise.emoji,
+                        style: const TextStyle(fontSize: 20)),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 12),
@@ -379,79 +385,91 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
     final targetValue =
         _isHoldStep ? step.progression.holdSeconds : step.progression.reps;
 
+    final imagePath =
+        'assets/images/exercises/${exercise.type.name}_${widget.currentStep.toString().padLeft(2, '0')}.jpg';
+
     return Container(
       decoration: BoxDecoration(
         color: kBgSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: kBorderSubtle),
       ),
-      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header row ──────────────────────────────────────────────────
-          Row(
-            children: [
-              // Tap the emoji box to view the exercise detail / photo
-              GestureDetector(
-                onTap: () => ExerciseDetailSheet.show(
-                  context,
-                  widget.type,
-                  widget.currentStep,
-                ),
-                child: Container(
-                  width: 38,
-                  height: 38,
-                  decoration: BoxDecoration(
-                    color: tierColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Center(
-                    child: Text(exercise.emoji,
-                        style: const TextStyle(fontSize: 18)),
+          // ── Exercise image banner ────────────────────────────────────────
+          GestureDetector(
+            onTap: () => ExerciseDetailSheet.show(
+                context, widget.type, widget.currentStep),
+            child: ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(15)),
+              child: SizedBox(
+                height: 110,
+                width: double.infinity,
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 110,
+                    color: tierColor.withValues(alpha: 0.08),
+                    child: Center(
+                      child: Text(exercise.emoji,
+                          style: const TextStyle(fontSize: 40)),
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            ),
+          ),
+          // ── Content ──────────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ── Header row ────────────────────────────────────────────
+                Row(
                   children: [
-                    Text(
-                      exercise.nameZh,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: kTextPrimary,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            exercise.nameZh,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: kTextPrimary,
+                            ),
+                          ),
+                          Text(
+                            '第${widget.currentStep}式 · ${step.nameZh}',
+                            style: const TextStyle(
+                                fontSize: 12, color: kTextSecondary),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      '第${widget.currentStep}式 · ${step.nameZh}',
-                      style: const TextStyle(
-                          fontSize: 12, color: kTextSecondary),
+                    // Target
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text('目標',
+                            style: TextStyle(
+                                fontSize: 10, color: kTextTertiary)),
+                        Text(
+                          step.progression.display,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: tierColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ),
-              // Target
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Text('目標',
-                      style: TextStyle(
-                          fontSize: 10, color: kTextTertiary)),
-                  Text(
-                    step.progression.display,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: tierColor,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
 
           // ── Logged set pills ────────────────────────────────────────────
           if (widget.sets.isNotEmpty) ...[
@@ -603,6 +621,9 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
               ],
             ),
           ],
+              ],
+            ),
+          ),
         ],
       ),
     );
