@@ -41,12 +41,8 @@ class ProgressionNotifier extends Notifier<UserProgression> {
     await ref.read(progressionRepositoryProvider).saveProgression(state);
   }
 
-  Future<void> setAllSteps(int step) async {
-    var updated = state;
-    for (final type in ExerciseType.values) {
-      updated = updated.withStep(type, step);
-    }
-    state = updated;
+  Future<void> setTrainingLevel(ExerciseType type, int level) async {
+    state = state.withTrainingLevel(type, level);
     await ref.read(progressionRepositoryProvider).saveProgression(state);
   }
 }
