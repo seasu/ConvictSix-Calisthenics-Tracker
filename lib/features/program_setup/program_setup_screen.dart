@@ -5,6 +5,7 @@ import '../../data/models/exercise.dart';
 import '../../data/models/training_schedule.dart';
 import '../../data/providers/app_providers.dart';
 import '../../shared/constants/exercises_data.dart';
+import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 
 class ProgramSetupScreen extends ConsumerStatefulWidget {
@@ -72,13 +73,117 @@ class _ProgressionTab extends ConsumerWidget {
 
     return ListView.separated(
       padding: const EdgeInsets.all(20),
-      itemCount: ExerciseType.values.length,
+      itemCount: ExerciseType.values.length + 1,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        final type = ExerciseType.values[index];
+        if (index == 0) return const _TierQuickSet();
+        final type = ExerciseType.values[index - 1];
         final currentStep = progression.stepFor(type);
         return _ExerciseStepCard(type: type, currentStep: currentStep);
       },
+    );
+  }
+}
+
+// ─── Tier quick-set ───────────────────────────────────────────────────────────
+
+class _TierQuickSet extends ConsumerWidget {
+  const _TierQuickSet();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '快速設定全部',
+          style:
+              theme.textTheme.labelMedium?.copyWith(color: Colors.white54),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _TierButton(
+                label: '入門',
+                subtitle: '第 1 式',
+                step: 1,
+                color: kTierBeginner,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _TierButton(
+                label: '中級',
+                subtitle: '第 5 式',
+                step: 5,
+                color: kTierMid,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _TierButton(
+                label: '進階',
+                subtitle: '第 8 式',
+                step: 8,
+                color: kTierAdvanced,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+      ],
+    );
+  }
+}
+
+class _TierButton extends ConsumerWidget {
+  const _TierButton({
+    required this.label,
+    required this.subtitle,
+    required this.step,
+    required this.color,
+  });
+
+  final String label;
+  final String subtitle;
+  final int step;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+      onTap: () =>
+          ref.read(progressionProvider.notifier).setAllSteps(step),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 11,
+                color: color.withValues(alpha: 0.65),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
