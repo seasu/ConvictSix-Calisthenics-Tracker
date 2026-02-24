@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
+import '../models/character.dart';
 import '../models/exercise.dart';
 import '../models/training_schedule.dart';
 import '../models/user_profile.dart';
@@ -46,6 +47,14 @@ class ProfilesNotifier extends Notifier<List<UserProfile>> {
 
   Future<void> deleteProfile(String id) async {
     final updated = state.where((p) => p.id != id).toList();
+    state = updated;
+    await ref.read(profileRepositoryProvider).saveProfiles(updated);
+  }
+
+  Future<void> setCharacterType(String id, CharacterType type) async {
+    final updated = state
+        .map((p) => p.id == id ? p.copyWith(characterType: type) : p)
+        .toList();
     state = updated;
     await ref.read(profileRepositoryProvider).saveProfiles(updated);
   }

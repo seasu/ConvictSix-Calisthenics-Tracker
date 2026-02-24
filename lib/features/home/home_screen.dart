@@ -3,14 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../data/models/character.dart';
 import '../../data/models/exercise.dart';
 import '../../data/models/user_profile.dart';
+import '../../data/models/user_progression.dart';
 import '../../data/providers/app_providers.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/character_painter.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.4.0';
+const _kAppVersion = 'v1.5.0';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -22,6 +25,12 @@ class HomeScreen extends ConsumerWidget {
     final activeSession = ref.watch(activeWorkoutProvider);
     final history = ref.watch(historyProvider);
     final todayExercises = schedule.todaysExercises;
+    final activeUserId = ref.watch(activeUserIdProvider);
+    final profiles = ref.watch(profilesProvider);
+    final currentProfile =
+        profiles.where((p) => p.id == activeUserId).firstOrNull;
+    final characterType = currentProfile?.characterType ?? CharacterType.male;
+    final charStage = characterStageFor(progression);
 
     final now = DateTime.now();
     final todayCompleted = history.any((s) =>
@@ -102,6 +111,18 @@ class HomeScreen extends ConsumerWidget {
                         isCompleted: todayCompleted && activeSession == null,
                       )
                     : const _RestDayCard(),
+              ),
+            ),
+
+            // ── Character card ────────────────────────────────────────────────
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+                child: _CharacterCard(
+                  characterType: characterType,
+                  stage: charStage,
+                  progression: progression,
+                ),
               ),
             ),
 
@@ -813,4 +834,140 @@ class _RestDayCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Character card ───────────────────────────────────────────────────────────
+
+class _CharacterCard extends StatelessWidget {
+  const _CharacterCard({
+    required this.characterType,
+    required this.stage,
+    required this.progression,
+  });
+
+  final CharacterType characterType;
+  final int stage;
+  final UserProgression progression;
+
+  @override
+  Widget build(BuildContext context) {
+    final stageColor = _stageColor(stage);
+    // Progress to next stage: fraction of the 4-step gap filled
+    final total = ExerciseType.values
+        .map<int>((t) => progression.stepFor(t) as int)
+        .fold(0, (a, b) => a + b);
+    final avg = total / ExerciseType.values.length;
+    final stageLow = (stage - 1) * 2.0;
+    final stageHigh = stage < 5 ? stage * 2.0 : 10.0;
+    final progress =
+        ((avg - stageLow) / (stageHigh - stageLow)).clamp(0.0, 1.0);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: kBgSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: stageColor.withValues(alpha: 0.35)),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          // ── Character art ────────────────────────────────────────────────
+          CharacterWidget(
+            type: characterType,
+            stage: stage,
+            width: 72,
+            height: 96,
+          ),
+          const SizedBox(width: 16),
+          // ── Info ─────────────────────────────────────────────────────────
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Stage badge
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: stageColor.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'Lv.$stage  ${stageTitle(stage)}',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: stageColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  stageSubtitle(stage),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: kTextPrimary,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Progress bar to next stage
+                if (stage < 5) ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            minHeight: 5,
+                            backgroundColor:
+                                stageColor.withValues(alpha: 0.15),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(stageColor),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${(progress * 100).round()}%',
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: stageColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '距離下一段位',
+                    style: const TextStyle(
+                        fontSize: 10, color: kTextTertiary),
+                  ),
+                ] else ...[
+                  Text(
+                    '已達最高境界！',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: stageColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Color _stageColor(int s) => switch (s) {
+        1 => kTextSecondary,
+        2 => kTierBeginner,
+        3 => kTierMid,
+        4 => kTierAdvanced,
+        _ => const Color(0xFFE040FB),
+      };
 }
