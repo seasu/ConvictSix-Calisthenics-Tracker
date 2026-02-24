@@ -17,12 +17,18 @@ class ExerciseProgressCard extends StatelessWidget {
     required this.type,
     required this.currentStep,
     this.isScheduledToday = false,
+    this.completedToday = false,
+    this.lastRecord,
     this.onTap,
   });
 
   final ExerciseType type;
   final int currentStep;
   final bool isScheduledToday;
+  /// True when the user has already logged at least one set for this exercise today.
+  final bool completedToday;
+  /// Most recent session summary, e.g. "3組·15下". Null if never trained.
+  final String? lastRecord;
   final VoidCallback? onTap;
 
   @override
@@ -38,9 +44,11 @@ class ExerciseProgressCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: kBgSurface,
           borderRadius: BorderRadius.circular(16),
-          border: isScheduledToday
-              ? Border.all(color: kPrimary.withValues(alpha: 0.7), width: 1)
-              : Border.all(color: kBorderSubtle, width: 1),
+          border: completedToday
+              ? Border.all(color: kTierBeginner.withValues(alpha: 0.6), width: 1)
+              : isScheduledToday
+                  ? Border.all(color: kPrimary.withValues(alpha: 0.7), width: 1)
+                  : Border.all(color: kBorderSubtle, width: 1),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         child: Row(
@@ -80,7 +88,25 @@ class ExerciseProgressCard extends StatelessWidget {
                           letterSpacing: -0.1,
                         ),
                       ),
-                      if (isScheduledToday) ...[
+                      if (completedToday) ...[
+                        const SizedBox(width: 6),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: kTierBeginner.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: const Text(
+                            '完成 ✓',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: kTierBeginner,
+                            ),
+                          ),
+                        ),
+                      ] else if (isScheduledToday) ...[
                         const SizedBox(width: 6),
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -112,6 +138,18 @@ class ExerciseProgressCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+                  if (lastRecord != null) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      '上次 $lastRecord',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: kTextTertiary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   // 10-dot progress
                   StepDots(currentStep: currentStep),
