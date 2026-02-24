@@ -10,7 +10,7 @@ import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.3.1';
+const _kAppVersion = 'v1.4.0';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -30,6 +30,45 @@ class HomeScreen extends ConsumerWidget {
         s.date.month == now.month &&
         s.date.day == now.day);
 
+    // ── Which exercises were actually trained today ──────────────────────────
+    final todaySets = [
+      ...history
+          .where((s) =>
+              s.isCompleted &&
+              s.date.year == now.year &&
+              s.date.month == now.month &&
+              s.date.day == now.day)
+          .expand((s) => s.sets),
+      if (activeSession != null) ...activeSession.sets,
+    ];
+    final trainedTodaySet = {for (final s in todaySets) s.exercise};
+
+    // ── Last session record per exercise ────────────────────────────────────
+    final completedSorted = [...history.where((s) => s.isCompleted)]
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    final lastRecordMap = <ExerciseType, String>{};
+    for (final exType in ExerciseType.values) {
+      for (final session in completedSorted) {
+        final sets =
+            session.sets.where((s) => s.exercise == exType).toList();
+        if (sets.isEmpty) continue;
+        final count = sets.length;
+        final String record;
+        if (sets.first.holdSeconds > 0) {
+          final best =
+              sets.map((s) => s.holdSeconds).reduce((a, b) => a > b ? a : b);
+          record = '$count組·${best}秒';
+        } else {
+          final best =
+              sets.map((s) => s.reps).reduce((a, b) => a > b ? a : b);
+          record = '$count組·${best}下';
+        }
+        lastRecordMap[exType] = record;
+        break;
+      }
+    }
+
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
@@ -43,20 +82,13 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
 
-            // ── Active session banner / today done banner ─────────────────────
+            // ── Active session banner ─────────────────────────────────────────
             if (activeSession != null)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: _ActiveSessionBanner(
                       setCount: activeSession.sets.length),
-                ),
-              )
-            else if (todayCompleted)
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: _TodayCompletedBanner(),
                 ),
               ),
 
@@ -102,6 +134,8 @@ class HomeScreen extends ConsumerWidget {
                         type: type,
                         currentStep: progression.stepFor(type),
                         isScheduledToday: todayExercises.contains(type),
+                        completedToday: trainedTodaySet.contains(type),
+                        lastRecord: lastRecordMap[type],
                         onTap: () => ExerciseDetailSheet.show(
                           context,
                           type,
@@ -626,61 +660,6 @@ class _ActiveSessionBanner extends StatelessWidget {
             ),
           ),
           const Icon(Icons.chevron_right, color: kTextTertiary, size: 20),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Today completed banner ───────────────────────────────────────────────────
-
-class _TodayCompletedBanner extends StatelessWidget {
-  const _TodayCompletedBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: kTierBeginner.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kTierBeginner.withValues(alpha: 0.35)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: kTierBeginner.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.check_circle_rounded,
-                color: kTierBeginner, size: 20),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '今日訓練已完成 🎉',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: kTierBeginner,
-                  ),
-                ),
-                Text(
-                  '很棒哦！繼續保持這個節奏！',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: kTextSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
