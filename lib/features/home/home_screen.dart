@@ -10,7 +10,7 @@ import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.1.0';
+const _kAppVersion = 'v1.2.0';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
