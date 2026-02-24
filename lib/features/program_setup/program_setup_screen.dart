@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/exercise.dart';
 import '../../data/models/training_schedule.dart';
 import '../../data/providers/app_providers.dart';
+import '../../features/intro/intro_screen.dart';
 import '../../shared/constants/exercises_data.dart';
 import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
@@ -40,6 +41,15 @@ class _ProgramSetupScreenState extends ConsumerState<ProgramSetupScreen>
           '計畫設定',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.help_outline_rounded),
+            tooltip: '說明',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const IntroScreen()),
+            ),
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Theme.of(context).colorScheme.primary,

@@ -40,9 +40,14 @@ class _IntroScreenState extends ConsumerState<IntroScreen> {
   Future<void> _finish() async {
     await ref.read(profileRepositoryProvider).markIntroSeen();
     if (!mounted) return;
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-    );
+    final nav = Navigator.of(context);
+    if (nav.canPop()) {
+      nav.pop();
+    } else {
+      nav.pushReplacement(
+        MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+      );
+    }
   }
 
   @override
