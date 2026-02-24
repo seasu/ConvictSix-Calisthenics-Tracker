@@ -158,12 +158,28 @@ The workflow:
 
 All dependencies (`shared_preferences`, `uuid`, `intl`) are fully web-compatible. `HapticFeedback` silently no-ops on web.
 
+### Version Bumping
+
+**Every commit that changes app behaviour must bump the version** in both:
+- `pubspec.yaml` → `version:` field (e.g. `1.3.0+4`)
+- `lib/features/home/home_screen.dart` → `_kAppVersion` constant (e.g. `'v1.3.0'`)
+
+Follow [Semantic Versioning](https://semver.org/):
+| Change type | Example | Rule |
+|---|---|---|
+| New feature | add screen, new UX flow | bump **minor** → `1.3.0` → `1.4.0` |
+| Bug fix / tweak | fix display, adjust style | bump **patch** → `1.3.0` → `1.3.1` |
+| Breaking / major rework | architecture change | bump **major** → `1.x.x` → `2.0.0` |
+
+The build number (`+N`) always increments by 1 regardless of which part changed.
+
 ### Before Committing
 
 1. Run `dart format .` — keep all Dart files consistently formatted.
 2. Run `flutter analyze` — fix every warning and error before pushing.
 3. Run `flutter test` — all tests must pass.
-4. Update `CLAUDE.md` if you add new packages, patterns, or directory conventions.
+4. **Bump the version** in `pubspec.yaml` and `home_screen.dart` (see Version Bumping above).
+5. Update `CLAUDE.md` if you add new packages, patterns, or directory conventions.
 
 ---
 
