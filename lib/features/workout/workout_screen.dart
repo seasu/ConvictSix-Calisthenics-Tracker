@@ -456,230 +456,228 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Exercise image banner ────────────────────────────────────────
-          GestureDetector(
-            onTap: () => ExerciseDetailSheet.show(
-                context, widget.type, widget.currentStep),
-            child: ClipRRect(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(15)),
-              child: SizedBox(
-                height: 110,
-                width: double.infinity,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 110,
-                    color: tierColor.withValues(alpha: 0.08),
-                    child: Center(
-                      child: Text(exercise.emoji,
-                          style: const TextStyle(fontSize: 40)),
+          // ── Header: thumbnail + name + target ────────────────────────────
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Thumbnail (BoxFit.contain — shows full image, no crop)
+                GestureDetector(
+                  onTap: () => ExerciseDetailSheet.show(
+                      context, widget.type, widget.currentStep),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Container(
+                      width: 64,
+                      height: 64,
+                      color: tierColor.withValues(alpha: 0.08),
+                      child: Image.asset(
+                        imagePath,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Center(
+                          child: Text(exercise.emoji,
+                              style: const TextStyle(fontSize: 28)),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          // ── Content ──────────────────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // ── Header row ────────────────────────────────────────────
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            exercise.nameZh,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: kTextPrimary,
-                            ),
-                          ),
-                          Text(
-                            '第${widget.currentStep}式 · ${step.nameZh}',
-                            style: const TextStyle(
-                                fontSize: 12, color: kTextSecondary),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Target (reflects selected training level)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text('目標',
-                            style: TextStyle(
-                                fontSize: 10, color: kTextTertiary)),
-                        Text(
-                          targetStandard.display,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: tierColor,
-                            fontWeight: FontWeight.w700,
-                          ),
+                const SizedBox(width: 12),
+                // Name + step
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        exercise.nameZh,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: kTextPrimary,
                         ),
-                      ],
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        '第${widget.currentStep}式 · ${step.nameZh}',
+                        style: const TextStyle(
+                            fontSize: 12, color: kTextSecondary),
+                      ),
+                    ],
+                  ),
+                ),
+                // Target
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text('目標',
+                        style: TextStyle(
+                            fontSize: 10, color: kTextTertiary)),
+                    const SizedBox(height: 2),
+                    Text(
+                      targetStandard.display,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: tierColor,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ],
                 ),
-
-          // ── Logged set pills ────────────────────────────────────────────
-          if (widget.sets.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: widget.sets.asMap().entries.map((entry) {
-                final i = entry.key;
-                final s = entry.value;
-                return Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: tierColor.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: tierColor.withValues(alpha: 0.35)),
-                  ),
-                  child: Text(
-                    '第${i + 1}組  ${s.displayReps}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: tierColor,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-
-          const SizedBox(height: 14),
-          const Divider(height: 1),
-          const SizedBox(height: 12),
-
-          // ── Quick-add buttons ───────────────────────────────────────────
-          if (!_showCustomInput) ...[
-            Row(
-              children: [
-                const Text(
-                  '快速記錄',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: kTextTertiary,
-                    letterSpacing: 0.4,
-                  ),
-                ),
-                const Spacer(),
-                // Undo last set
-                if (widget.sets.isNotEmpty)
-                  GestureDetector(
-                    onTap: () => ref
-                        .read(activeWorkoutProvider.notifier)
-                        .removeLastSet(widget.type),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.undo_rounded,
-                            size: 14, color: kTextTertiary),
-                        SizedBox(width: 3),
-                        Text(
-                          '撤銷',
-                          style: TextStyle(
-                              fontSize: 12, color: kTextTertiary),
-                        ),
-                      ],
-                    ),
-                  ),
               ],
             ),
-            const SizedBox(height: 10),
-            // Quick-tap value buttons
-            Row(
-              children: [
-                ...quickValues.map((v) {
-                  final isTarget = v == targetValue;
-                  return Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 6),
-                      child: _QuickButton(
-                        value: v,
-                        unit: unit,
-                        isTarget: isTarget,
-                        tierColor: tierColor,
-                        onTap: () => _logValue(v),
+          ),
+
+          // ── Logged set pills ──────────────────────────────────────────────
+          if (widget.sets.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
+              child: Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: widget.sets.asMap().entries.map((entry) {
+                  final i = entry.key;
+                  final s = entry.value;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: tierColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                          color: tierColor.withValues(alpha: 0.35)),
+                    ),
+                    child: Text(
+                      '第${i + 1}組  ${s.displayReps}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: tierColor,
                       ),
                     ),
                   );
-                }),
-                // Custom button
-                _QuickButton(
-                  value: -1,
-                  unit: unit,
-                  isTarget: false,
-                  tierColor: tierColor,
-                  label: '自訂',
-                  onTap: () => setState(() {
-                    _showCustomInput = true;
-                    _repsController.clear();
-                  }),
-                ),
-              ],
-            ),
-          ] else ...[
-            // ── Custom input ───────────────────────────────────────────────
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _repsController,
-                    keyboardType: TextInputType.number,
-                    autofocus: true,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: kTextPrimary,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: _isHoldStep ? '秒數' : '下數',
-                      suffixText: unit,
-                      suffixStyle: const TextStyle(
-                          color: kTextSecondary, fontSize: 14),
-                    ),
-                    onSubmitted: (_) => _logCustom(),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                FilledButton(
-                  onPressed: _logCustom,
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 14),
-                  ),
-                  child: const Text('記錄'),
-                ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () =>
-                      setState(() => _showCustomInput = false),
-                  icon: const Icon(Icons.close_rounded, size: 20),
-                  style: IconButton.styleFrom(
-                    backgroundColor: kBgSurface2,
-                    foregroundColor: kTextSecondary,
-                  ),
-                ),
-              ],
+                }).toList(),
+              ),
             ),
           ],
+
+          const Divider(height: 1),
+
+          // ── Quick-add area ────────────────────────────────────────────────
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (!_showCustomInput) ...[
+                  Row(
+                    children: [
+                      const Text(
+                        '快速記錄',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: kTextTertiary,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (widget.sets.isNotEmpty)
+                        GestureDetector(
+                          onTap: () => ref
+                              .read(activeWorkoutProvider.notifier)
+                              .removeLastSet(widget.type),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.undo_rounded,
+                                  size: 14, color: kTextTertiary),
+                              SizedBox(width: 3),
+                              Text('撤銷',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: kTextTertiary)),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      ...quickValues.map((v) {
+                        final isTarget = v == targetValue;
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 5),
+                            child: _QuickButton(
+                              value: v,
+                              unit: unit,
+                              isTarget: isTarget,
+                              tierColor: tierColor,
+                              onTap: () => _logValue(v),
+                            ),
+                          ),
+                        );
+                      }),
+                      _QuickButton(
+                        value: -1,
+                        unit: unit,
+                        isTarget: false,
+                        tierColor: tierColor,
+                        label: '自訂',
+                        onTap: () => setState(() {
+                          _showCustomInput = true;
+                          _repsController.clear();
+                        }),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _repsController,
+                          keyboardType: TextInputType.number,
+                          autofocus: true,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: kTextPrimary,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: _isHoldStep ? '秒數' : '下數',
+                            suffixText: unit,
+                            suffixStyle: const TextStyle(
+                                color: kTextSecondary, fontSize: 14),
+                          ),
+                          onSubmitted: (_) => _logCustom(),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      FilledButton(
+                        onPressed: _logCustom,
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 14),
+                        ),
+                        child: const Text('記錄'),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () =>
+                            setState(() => _showCustomInput = false),
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        style: IconButton.styleFrom(
+                          backgroundColor: kBgSurface2,
+                          foregroundColor: kTextSecondary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
