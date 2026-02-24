@@ -13,7 +13,7 @@ import '../../shared/widgets/character_painter.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.5.0';
+const _kAppVersion = 'v1.5.1';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -67,11 +67,11 @@ class HomeScreen extends ConsumerWidget {
         if (sets.first.holdSeconds > 0) {
           final best =
               sets.map((s) => s.holdSeconds).reduce((a, b) => a > b ? a : b);
-          record = '$count組·${best}秒';
+          record = '$count組·$best秒';
         } else {
           final best =
               sets.map((s) => s.reps).reduce((a, b) => a > b ? a : b);
-          record = '$count組·${best}下';
+          record = '$count組·$best下';
         }
         lastRecordMap[exType] = record;
         break;
@@ -854,7 +854,7 @@ class _CharacterCard extends StatelessWidget {
     final stageColor = _stageColor(stage);
     // Progress to next stage: fraction of the 4-step gap filled
     final total = ExerciseType.values
-        .map<int>((t) => progression.stepFor(t) as int)
+        .map<int>((t) => progression.stepFor(t))
         .fold(0, (a, b) => a + b);
     final avg = total / ExerciseType.values.length;
     final stageLow = (stage - 1) * 2.0;
@@ -940,9 +940,9 @@ class _CharacterCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
+                  const Text(
                     '距離下一段位',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 10, color: kTextTertiary),
                   ),
                 ] else ...[
