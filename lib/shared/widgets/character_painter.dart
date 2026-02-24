@@ -416,7 +416,7 @@ class CharacterPainter extends CustomPainter {
       canvas.drawPath(nosePath, Paint()..color = const Color(0xFFEF9A9A));
     } else if (type == CharacterType.dog) {
       canvas.drawOval(
-        const Rect.fromCenter(
+        Rect.fromCenter(
             center: Offset(_cx, _hy + 7), width: 10, height: 7),
         Paint()..color = const Color(0xFF4E342E),
       );
@@ -467,7 +467,7 @@ class CharacterPainter extends CustomPainter {
     // Dog tongue at stage 3+
     if (type == CharacterType.dog && stage >= 3) {
       canvas.drawOval(
-        const Rect.fromCenter(
+        Rect.fromCenter(
             center: Offset(_cx, baseY + 7), width: 9, height: 11),
         Paint()..color = const Color(0xFFEF9A9A),
       );
@@ -492,11 +492,11 @@ class CharacterPainter extends CustomPainter {
   void _drawBlush(Canvas canvas) {
     final p = Paint()..color = const Color(0xFFEF9A9A).withValues(alpha: 0.5);
     canvas.drawOval(
-        const Rect.fromCenter(
+        Rect.fromCenter(
             center: Offset(_cx - 18, _hy + 9), width: 14, height: 8),
         p);
     canvas.drawOval(
-        const Rect.fromCenter(
+        Rect.fromCenter(
             center: Offset(_cx + 18, _hy + 9), width: 14, height: 8),
         p);
   }
@@ -585,10 +585,10 @@ class CharacterPainter extends CustomPainter {
     canvas.drawPath(path, outline);
     // Jewels
     canvas.drawCircle(
-        Offset(_cx, top + 2), 3, Paint()..color = const Color(0xFFE53935));
-    canvas.drawCircle(Offset(_cx - 12, top + 5), 2,
+        const Offset(_cx, top + 2), 3, Paint()..color = const Color(0xFFE53935));
+    canvas.drawCircle(const Offset(_cx - 12, top + 5), 2,
         Paint()..color = const Color(0xFF1E88E5));
-    canvas.drawCircle(Offset(_cx + 12, top + 5), 2,
+    canvas.drawCircle(const Offset(_cx + 12, top + 5), 2,
         Paint()..color = const Color(0xFF43A047));
   }
 
