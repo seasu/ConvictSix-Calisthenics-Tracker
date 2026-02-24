@@ -417,7 +417,7 @@ class CharacterPainter extends CustomPainter {
     } else if (type == CharacterType.dog) {
       canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(_cx, _hy + 7), width: 10, height: 7),
+            center: const Offset(_cx, _hy + 7), width: 10, height: 7),
         Paint()..color = const Color(0xFF4E342E),
       );
     } else {
@@ -468,7 +468,7 @@ class CharacterPainter extends CustomPainter {
     if (type == CharacterType.dog && stage >= 3) {
       canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(_cx, baseY + 7), width: 9, height: 11),
+            center: const Offset(_cx, baseY + 7), width: 9, height: 11),
         Paint()..color = const Color(0xFFEF9A9A),
       );
     }
@@ -493,11 +493,11 @@ class CharacterPainter extends CustomPainter {
     final p = Paint()..color = const Color(0xFFEF9A9A).withValues(alpha: 0.5);
     canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(_cx - 18, _hy + 9), width: 14, height: 8),
+            center: const Offset(_cx - 18, _hy + 9), width: 14, height: 8),
         p);
     canvas.drawOval(
         Rect.fromCenter(
-            center: Offset(_cx + 18, _hy + 9), width: 14, height: 8),
+            center: const Offset(_cx + 18, _hy + 9), width: 14, height: 8),
         p);
   }
 

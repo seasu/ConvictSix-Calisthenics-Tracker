@@ -13,7 +13,7 @@ import '../../shared/widgets/character_painter.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.5.2';
+const _kAppVersion = 'v1.5.3';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
