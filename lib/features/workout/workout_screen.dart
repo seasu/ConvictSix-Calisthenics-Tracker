@@ -8,6 +8,7 @@ import '../../data/models/workout_session.dart';
 import '../../data/providers/app_providers.dart';
 import '../../shared/constants/exercises_data.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/exercise_detail_sheet.dart';
 
 const _uuid = Uuid();
 
@@ -391,16 +392,24 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
           // ── Header row ──────────────────────────────────────────────────
           Row(
             children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(
-                  color: tierColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+              // Tap the emoji box to view the exercise detail / photo
+              GestureDetector(
+                onTap: () => ExerciseDetailSheet.show(
+                  context,
+                  widget.type,
+                  widget.currentStep,
                 ),
-                child: Center(
-                  child: Text(exercise.emoji,
-                      style: const TextStyle(fontSize: 18)),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: tierColor.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Center(
+                    child: Text(exercise.emoji,
+                        style: const TextStyle(fontSize: 18)),
+                  ),
                 ),
               ),
               const SizedBox(width: 10),
