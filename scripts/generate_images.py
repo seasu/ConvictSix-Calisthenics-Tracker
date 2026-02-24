@@ -23,7 +23,7 @@ import requests
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
 IMAGEN_URL = (
     "https://generativelanguage.googleapis.com/v1beta"
-    "/models/gemini-2.0-flash-preview-image-generation:generateContent"
+    "/models/gemini-2.5-flash-image:generateContent"
 )
 OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "images" / "exercises"
 PROMPTS_FILE = Path(__file__).parent.parent / "docs" / "image_prompts.md"
@@ -68,11 +68,11 @@ def parse_prompts(md_path: Path) -> list[dict]:
 # ── Gemini Imagen API call ────────────────────────────────────────────────────
 
 def generate_image(prompt: str) -> bytes:
-    """Call Gemini image generation and return JPEG bytes."""
+    """Call Gemini 2.5 Flash Image (Nano Banana) and return JPEG bytes."""
     full_prompt = GLOBAL_STYLE + prompt
     payload = {
         "contents": [{"parts": [{"text": full_prompt}]}],
-        "generationConfig": {"responseModalities": ["IMAGE"]},
+        "generationConfig": {"responseModalities": ["IMAGE"], "imageConfig": {"aspectRatio": "1:1"}},
     }
     resp = requests.post(
         IMAGEN_URL,
