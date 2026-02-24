@@ -2,6 +2,11 @@
 
 This file provides guidance for AI assistants (Claude Code, Copilot, etc.) working on this repository. Keep it up to date as the project evolves.
 
+> **Before starting any session, read:**
+> - [`tasks/agent-workflow.md`](tasks/agent-workflow.md) — how to plan, execute, and self-correct
+> - [`tasks/lessons.md`](tasks/lessons.md) — mistakes already made; do not repeat them
+> - [`tasks/todo.md`](tasks/todo.md) — current task log
+
 ---
 
 ## Project Overview
