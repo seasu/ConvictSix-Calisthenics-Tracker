@@ -8,6 +8,8 @@ import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
+const _kAppVersion = 'v1.1.0';
+
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -126,15 +128,39 @@ class _Header extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // App name
-                const Text(
-                  'ConvictSix',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w900,
-                    color: kPrimary,
-                    letterSpacing: -0.5,
-                  ),
+                // App name + version
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    const Text(
+                      'ConvictSix',
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w900,
+                        color: kPrimary,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 7),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: kPrimary.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        _kAppVersion,
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          color: kPrimary,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 2),
                 Text(
