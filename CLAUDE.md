@@ -190,6 +190,8 @@ The build number (`+N`) always increments by 1 regardless of which part changed.
 - Follow the [Dart style guide](https://dart.dev/guides/language/effective-dart/style).
 - Use `dart format` (80-character line length by default).
 - Prefer `const` constructors wherever possible to aid widget rebuild performance.
+- In `CustomPainter`, local variables derived purely from `static const` fields should be declared `const` (not `final`), e.g. `const bodyTop = _hy + _hr - 6.0;`.
+- Flutter geometry `const` cheat-sheet — **can** be `const`: `Offset(x, y)`, `Rect.fromLTWH(...)`, `Size(w, h)`, `Radius.circular(r)` when arguments are constants. **Cannot** be `const`: `Rect.fromCenter(...)`, `RRect.fromRectAndRadius(...)`, `Paint()`. Do not add `const` to these.
 - Use named parameters for widgets with more than two meaningful arguments.
 - Avoid `dynamic`; prefer explicit types or generics.
 - Do not suppress analyser warnings with `// ignore:` without an explanatory comment.
