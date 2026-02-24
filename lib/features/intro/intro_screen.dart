@@ -154,11 +154,11 @@ class _WelcomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _PageShell(
+    return const _PageShell(
       emoji: '💪',
       title: '歡迎使用\nConvictSix',
       body: '結合囚徒健身精髓的自重訓練追蹤工具，\n助你系統性地征服六項菁英動作。\n\n無需器材・不分場地・純粹力量',
-      extra: const _HighlightRow(items: ['自由', '漸進', '菁英']),
+      extra: _HighlightRow(items: ['自由', '漸進', '菁英']),
     );
   }
 }
@@ -170,11 +170,11 @@ class _ConceptPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _PageShell(
+    return const _PageShell(
       emoji: '🏋️',
       title: '囚徒健身\n是什麼？',
       body: '囚徒健身（Convict Conditioning）是 Paul Wade 在獄中研發的自重力量系統，以最純粹的動作模式，透過十個漸進步驟，從入門到菁英，塑造真實的功能性力量。',
-      extra: const _BulletList(items: [
+      extra: _BulletList(items: [
         '不依賴器材，身體即是器械',
         '關節友善，強化深層穩定肌',
         '循序漸進，成果有據可查',
@@ -190,11 +190,11 @@ class _SixMovesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _PageShell(
+    return const _PageShell(
       emoji: '6️⃣',
       title: '六大\n核心動作',
       body: '系統由六個根本動作構成，覆蓋全身所有主要肌群與動作模式：',
-      extra: const _ExerciseGrid(),
+      extra: _ExerciseGrid(),
     );
   }
 }
@@ -206,11 +206,11 @@ class _ProgressionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _PageShell(
+    return const _PageShell(
       emoji: '🎯',
       title: '十式進階\n系統',
       body: '每個動作各有十個難度遞增的「式」。完成當前式的晉級標準，就能解鎖下一式。',
-      extra: const _TierList(),
+      extra: _TierList(),
     );
   }
 }
@@ -455,7 +455,7 @@ class _TierList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _TierRow(
+        const _TierRow(
           color: kTierBeginner,
           label: '初學',
           range: '式 1–4',
@@ -463,7 +463,7 @@ class _TierList extends StatelessWidget {
           desc: '建立動作基礎，培養關節韌性',
         ),
         const SizedBox(height: 10),
-        _TierRow(
+        const _TierRow(
           color: kTierMid,
           label: '中級',
           range: '式 5–7',
@@ -471,7 +471,7 @@ class _TierList extends StatelessWidget {
           desc: '強化肌力，掌握高難度變體',
         ),
         const SizedBox(height: 10),
-        _TierRow(
+        const _TierRow(
           color: kTierAdvanced,
           label: '進階',
           range: '式 8–10',
