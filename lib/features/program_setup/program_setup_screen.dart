@@ -73,117 +73,13 @@ class _ProgressionTab extends ConsumerWidget {
 
     return ListView.separated(
       padding: const EdgeInsets.all(20),
-      itemCount: ExerciseType.values.length + 1,
+      itemCount: ExerciseType.values.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
-        if (index == 0) return const _TierQuickSet();
-        final type = ExerciseType.values[index - 1];
+        final type = ExerciseType.values[index];
         final currentStep = progression.stepFor(type);
         return _ExerciseStepCard(type: type, currentStep: currentStep);
       },
-    );
-  }
-}
-
-// ─── Tier quick-set ───────────────────────────────────────────────────────────
-
-class _TierQuickSet extends ConsumerWidget {
-  const _TierQuickSet();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '快速設定全部',
-          style:
-              theme.textTheme.labelMedium?.copyWith(color: Colors.white54),
-        ),
-        const SizedBox(height: 10),
-        const Row(
-          children: [
-            Expanded(
-              child: _TierButton(
-                label: '入門',
-                subtitle: '第 1 式',
-                step: 1,
-                color: kTierBeginner,
-              ),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              child: _TierButton(
-                label: '中級',
-                subtitle: '第 5 式',
-                step: 5,
-                color: kTierMid,
-              ),
-            ),
-            SizedBox(width: 8),
-            Expanded(
-              child: _TierButton(
-                label: '進階',
-                subtitle: '第 8 式',
-                step: 8,
-                color: kTierAdvanced,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-      ],
-    );
-  }
-}
-
-class _TierButton extends ConsumerWidget {
-  const _TierButton({
-    required this.label,
-    required this.subtitle,
-    required this.step,
-    required this.color,
-  });
-
-  final String label;
-  final String subtitle;
-  final int step;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () =>
-          ref.read(progressionProvider.notifier).setAllSteps(step),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              subtitle,
-              style: TextStyle(
-                fontSize: 11,
-                color: color.withValues(alpha: 0.65),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -319,22 +215,29 @@ class _ExerciseStepCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 14),
-          // Progression target info
-          _ProgressionStandard(step: step),
+          // Training intensity selector
+          _ProgressionStandard(exerciseType: type, step: step),
         ],
       ),
     );
   }
 }
 
-class _ProgressionStandard extends StatelessWidget {
-  const _ProgressionStandard({required this.step});
+class _ProgressionStandard extends ConsumerWidget {
+  const _ProgressionStandard({
+    required this.exerciseType,
+    required this.step,
+  });
 
-  final dynamic step;
+  final ExerciseType exerciseType;
+  final ExerciseStep step;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final currentLevel =
+        ref.watch(progressionProvider).trainingLevelFor(exerciseType);
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -345,25 +248,48 @@ class _ProgressionStandard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '晉級標準',
+            '訓練強度',
             style: theme.textTheme.labelMedium
                 ?.copyWith(color: Colors.white54),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Row(
             children: [
-              _StandardChip(
-                  label: '入門', value: step.beginner.display, color: Colors.green),
+              Expanded(
+                child: _StandardChip(
+                  label: '入門',
+                  value: step.beginner.display,
+                  color: kTierBeginner,
+                  selected: currentLevel == 0,
+                  onTap: () => ref
+                      .read(progressionProvider.notifier)
+                      .setTrainingLevel(exerciseType, 0),
+                ),
+              ),
               const SizedBox(width: 8),
-              _StandardChip(
+              Expanded(
+                child: _StandardChip(
                   label: '中級',
                   value: step.intermediate.display,
-                  color: Colors.orange),
+                  color: kTierMid,
+                  selected: currentLevel == 1,
+                  onTap: () => ref
+                      .read(progressionProvider.notifier)
+                      .setTrainingLevel(exerciseType, 1),
+                ),
+              ),
               const SizedBox(width: 8),
-              _StandardChip(
+              Expanded(
+                child: _StandardChip(
                   label: '晉級',
                   value: step.progression.display,
-                  color: theme.colorScheme.primary),
+                  color: kTierAdvanced,
+                  selected: currentLevel == 2,
+                  onTap: () => ref
+                      .read(progressionProvider.notifier)
+                      .setTrainingLevel(exerciseType, 2),
+                ),
+              ),
             ],
           ),
         ],
@@ -377,23 +303,65 @@ class _StandardChip extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
+    required this.selected,
+    required this.onTap,
   });
 
   final String label;
   final String value;
   final Color color;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: TextStyle(
-                fontSize: 10, color: color, fontWeight: FontWeight.bold)),
-        Text(value,
-            style: const TextStyle(fontSize: 12, color: Colors.white70)),
-      ],
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? color.withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: selected ? color : Colors.white.withValues(alpha: 0.12),
+            width: selected ? 1.5 : 1,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (selected) ...[
+                  Icon(Icons.check_circle_rounded, size: 10, color: color),
+                  const SizedBox(width: 3),
+                ],
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? color : Colors.white38,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 3),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: selected ? Colors.white : Colors.white38,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

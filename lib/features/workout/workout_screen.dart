@@ -381,9 +381,16 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
     final tierColor = stepTierColor(widget.currentStep);
     final quickValues = _isHoldStep ? _quickHolds : _quickReps;
     final unit = _isHoldStep ? '秒' : '下';
-    // Highlight the target rep/hold if it appears in quick values
+    // Highlight the target based on the selected training level
+    final trainingLevel =
+        ref.watch(progressionProvider).trainingLevelFor(widget.type);
+    final targetStandard = trainingLevel == 0
+        ? step.beginner
+        : trainingLevel == 1
+            ? step.intermediate
+            : step.progression;
     final targetValue =
-        _isHoldStep ? step.progression.holdSeconds : step.progression.reps;
+        _isHoldStep ? targetStandard.holdSeconds : targetStandard.reps;
 
     final imagePath =
         'assets/images/exercises/${exercise.type.name}_${widget.currentStep.toString().padLeft(2, '0')}.jpg';
