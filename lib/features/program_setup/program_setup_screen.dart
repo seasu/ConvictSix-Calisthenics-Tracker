@@ -102,7 +102,7 @@ class _TierQuickSet extends ConsumerWidget {
               theme.textTheme.labelMedium?.copyWith(color: Colors.white54),
         ),
         const SizedBox(height: 10),
-        Row(
+        const Row(
           children: [
             Expanded(
               child: _TierButton(
@@ -112,7 +112,7 @@ class _TierQuickSet extends ConsumerWidget {
                 color: kTierBeginner,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: _TierButton(
                 label: '中級',
@@ -121,7 +121,7 @@ class _TierQuickSet extends ConsumerWidget {
                 color: kTierMid,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Expanded(
               child: _TierButton(
                 label: '進階',
