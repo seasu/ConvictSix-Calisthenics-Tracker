@@ -4,13 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/workout_session.dart';
 
-const _historyKey = 'workout_history_v1';
-const _activeSessionKey = 'active_workout_session_v1';
-
 class WorkoutRepository {
-  const WorkoutRepository(this._prefs);
+  const WorkoutRepository(this._prefs, this._userId);
 
   final SharedPreferences _prefs;
+  final String _userId;
+
+  String get _historyKey => 'workout_history_v1_$_userId';
+  String get _activeSessionKey => 'active_workout_session_v1_$_userId';
 
   List<WorkoutSession> loadHistory() {
     final raw = _prefs.getString(_historyKey);

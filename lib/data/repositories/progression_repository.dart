@@ -5,13 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/user_progression.dart';
 import '../models/training_schedule.dart';
 
-const _progressionKey = 'user_progression_v1';
-const _scheduleKey = 'training_schedule_v1';
-
 class ProgressionRepository {
-  const ProgressionRepository(this._prefs);
+  const ProgressionRepository(this._prefs, this._userId);
 
   final SharedPreferences _prefs;
+  final String _userId;
+
+  String get _progressionKey => 'user_progression_v1_$_userId';
+  String get _scheduleKey => 'training_schedule_v1_$_userId';
 
   UserProgression loadProgression() {
     final raw = _prefs.getString(_progressionKey);

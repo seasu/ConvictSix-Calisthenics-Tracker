@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'features/history/history_screen.dart';
 import 'features/home/home_screen.dart';
+import 'features/intro/intro_screen.dart';
 import 'features/program_setup/program_setup_screen.dart';
 import 'features/workout/workout_screen.dart';
 import 'shared/theme/app_theme.dart';
 
 class ConvictSixApp extends StatelessWidget {
-  const ConvictSixApp({super.key});
+  const ConvictSixApp({super.key, this.showIntro = false});
+
+  final bool showIntro;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +19,9 @@ class ConvictSixApp extends StatelessWidget {
       title: 'ConvictSix Tracker',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      home: const MainNavigationScreen(),
+      home: showIntro
+          ? const IntroScreen()
+          : const MainNavigationScreen(),
     );
   }
 }
