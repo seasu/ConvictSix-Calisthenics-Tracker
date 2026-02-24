@@ -33,7 +33,15 @@ class _NoActiveWorkoutView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final schedule = ref.watch(scheduleProvider);
     final progression = ref.watch(progressionProvider);
+    final history = ref.watch(historyProvider);
     final todayExercises = schedule.todaysExercises;
+
+    final now = DateTime.now();
+    final todayCompleted = history.any((s) =>
+        s.isCompleted &&
+        s.date.year == now.year &&
+        s.date.month == now.month &&
+        s.date.day == now.day);
 
     return Scaffold(
       appBar: AppBar(title: const Text('訓練')),
@@ -41,8 +49,10 @@ class _NoActiveWorkoutView extends ConsumerWidget {
         padding: const EdgeInsets.all(16),
         children: [
           const SizedBox(height: 4),
-          // Today's plan preview
-          if (todayExercises.isNotEmpty) ...[
+          if (todayCompleted) ...[
+            const _WorkoutDoneCard(),
+            const SizedBox(height: 24),
+          ] else if (todayExercises.isNotEmpty) ...[
             const _SectionLabel('今日計畫'),
             const SizedBox(height: 10),
             ...todayExercises.map(
@@ -61,14 +71,21 @@ class _NoActiveWorkoutView extends ConsumerWidget {
             child: FilledButton.icon(
               onPressed: () =>
                   ref.read(activeWorkoutProvider.notifier).startWorkout(),
-              icon: const Icon(Icons.play_arrow_rounded, size: 22),
-              label: const Text('開始訓練'),
+              icon: Icon(
+                todayCompleted
+                    ? Icons.refresh_rounded
+                    : Icons.play_arrow_rounded,
+                size: 22,
+              ),
+              label: Text(todayCompleted ? '再次訓練' : '開始訓練'),
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 textStyle: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                 ),
+                backgroundColor: todayCompleted ? kBgSurface2 : null,
+                foregroundColor: todayCompleted ? kTextSecondary : null,
               ),
             ),
           ),
@@ -273,11 +290,39 @@ class _ActiveWorkoutView extends ConsumerWidget {
   }
 
   Future<void> _confirmFinish(BuildContext context, WidgetRef ref) async {
+    final setCount = session.sets.length;
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('完成訓練'),
-        content: Text('共記錄 ${session.sets.length} 組，確定儲存？'),
+        backgroundColor: kBgSurface,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Column(
+          children: [
+            Text('🎉', style: TextStyle(fontSize: 44)),
+            SizedBox(height: 8),
+            Text(
+              '訓練完成！',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: kTextPrimary,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          '很棒哦！共完成 $setCount 組訓練\n繼續保持這個節奏！',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 14,
+            color: kTextSecondary,
+            height: 1.6,
+          ),
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -290,7 +335,7 @@ class _ActiveWorkoutView extends ConsumerWidget {
         ],
       ),
     );
-    if (ok == true) {
+    if (ok == true && context.mounted) {
       await ref.read(activeWorkoutProvider.notifier).finishWorkout();
     }
   }
@@ -701,6 +746,48 @@ class _QuickButton extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Workout done card ────────────────────────────────────────────────────────
+
+class _WorkoutDoneCard extends StatelessWidget {
+  const _WorkoutDoneCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: kBgSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: kTierBeginner.withValues(alpha: 0.3)),
+      ),
+      child: const Column(
+        children: [
+          Text('🎉', style: TextStyle(fontSize: 44)),
+          SizedBox(height: 12),
+          Text(
+            '今日訓練已完成！',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: kTextPrimary,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            '很棒哦！繼續保持這個節奏，\n你越來越強了！',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: kTextSecondary,
+              height: 1.6,
+              fontSize: 13,
+            ),
+          ),
+        ],
       ),
     );
   }
