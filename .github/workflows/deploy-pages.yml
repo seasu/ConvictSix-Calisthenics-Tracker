@@ -43,6 +43,9 @@ jobs:
       - name: Analyse code
         run: flutter analyze --no-fatal-warnings
 
+      - name: Run tests
+        run: flutter test
+
       - name: Build web (release)
         # base-href must match the GitHub Pages subpath: /<repo-name>/
         run: |
