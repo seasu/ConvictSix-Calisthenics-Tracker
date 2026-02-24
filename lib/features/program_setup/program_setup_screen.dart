@@ -5,6 +5,7 @@ import '../../data/models/exercise.dart';
 import '../../data/models/training_schedule.dart';
 import '../../data/providers/app_providers.dart';
 import '../../shared/constants/exercises_data.dart';
+import '../../shared/widgets/exercise_detail_sheet.dart';
 
 class ProgramSetupScreen extends ConsumerStatefulWidget {
   const ProgramSetupScreen({super.key});
@@ -122,6 +123,20 @@ class _ExerciseStepCard extends ConsumerWidget {
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              // Info button — opens exercise detail sheet with photo
+              GestureDetector(
+                onTap: () =>
+                    ExerciseDetailSheet.show(context, type, currentStep),
+                child: const Padding(
+                  padding: EdgeInsets.all(4),
+                  child: Icon(
+                    Icons.info_outline_rounded,
+                    size: 18,
+                    color: Colors.white38,
+                  ),
                 ),
               ),
             ],

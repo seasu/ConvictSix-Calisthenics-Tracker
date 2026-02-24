@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../data/models/exercise.dart';
 import '../../data/providers/app_providers.dart';
 import '../../shared/theme/app_theme.dart';
+import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -78,6 +79,11 @@ class HomeScreen extends ConsumerWidget {
                         type: type,
                         currentStep: progression.stepFor(type),
                         isScheduledToday: todayExercises.contains(type),
+                        onTap: () => ExerciseDetailSheet.show(
+                          context,
+                          type,
+                          progression.stepFor(type),
+                        ),
                       ),
                     );
                   },
