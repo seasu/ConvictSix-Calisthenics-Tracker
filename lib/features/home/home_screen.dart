@@ -20,7 +20,15 @@ class HomeScreen extends ConsumerWidget {
     final progression = ref.watch(progressionProvider);
     final schedule = ref.watch(scheduleProvider);
     final activeSession = ref.watch(activeWorkoutProvider);
+    final history = ref.watch(historyProvider);
     final todayExercises = schedule.todaysExercises;
+
+    final now = DateTime.now();
+    final todayCompleted = history.any((s) =>
+        s.isCompleted &&
+        s.date.year == now.year &&
+        s.date.month == now.month &&
+        s.date.day == now.day);
 
     return Scaffold(
       body: SafeArea(
@@ -31,16 +39,24 @@ class HomeScreen extends ConsumerWidget {
               child: _Header(
                 todayExercises: todayExercises,
                 hasActiveSession: activeSession != null,
+                todayCompleted: todayCompleted,
               ),
             ),
 
-            // ── Active session banner ────────────────────────────────────────
+            // ── Active session banner / today done banner ─────────────────────
             if (activeSession != null)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: _ActiveSessionBanner(
                       setCount: activeSession.sets.length),
+                ),
+              )
+            else if (todayCompleted)
+              const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  child: _TodayCompletedBanner(),
                 ),
               ),
 
@@ -49,7 +65,10 @@ class HomeScreen extends ConsumerWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
                 child: todayExercises.isNotEmpty
-                    ? _TodayCard(exercises: todayExercises)
+                    ? _TodayCard(
+                        exercises: todayExercises,
+                        isCompleted: todayCompleted,
+                      )
                     : const _RestDayCard(),
               ),
             ),
@@ -110,10 +129,12 @@ class _Header extends ConsumerWidget {
   const _Header({
     required this.todayExercises,
     required this.hasActiveSession,
+    required this.todayCompleted,
   });
 
   final List<ExerciseType> todayExercises;
   final bool hasActiveSession;
+  final bool todayCompleted;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -245,23 +266,38 @@ class _Header extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: kBgSurface,
+                  color: todayCompleted
+                      ? kTierBeginner.withValues(alpha: 0.10)
+                      : kBgSurface,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: kBorderSubtle),
+                  border: Border.all(
+                    color: todayCompleted
+                        ? kTierBeginner.withValues(alpha: 0.35)
+                        : kBorderSubtle,
+                  ),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      todayExercises.isEmpty ? '😴' : '🔥',
+                      todayExercises.isEmpty
+                          ? '😴'
+                          : todayCompleted
+                              ? '✅'
+                              : '🔥',
                       style: const TextStyle(fontSize: 13),
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      todayExercises.isEmpty ? '休息日' : '訓練日',
-                      style: const TextStyle(
+                      todayExercises.isEmpty
+                          ? '休息日'
+                          : todayCompleted
+                              ? '今日完成'
+                              : '訓練日',
+                      style: TextStyle(
                         fontSize: 10,
-                        color: kTextTertiary,
+                        color:
+                            todayCompleted ? kTierBeginner : kTextTertiary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -596,21 +632,83 @@ class _ActiveSessionBanner extends StatelessWidget {
   }
 }
 
+// ─── Today completed banner ───────────────────────────────────────────────────
+
+class _TodayCompletedBanner extends StatelessWidget {
+  const _TodayCompletedBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: kTierBeginner.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: kTierBeginner.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: kTierBeginner.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.check_circle_rounded,
+                color: kTierBeginner, size: 20),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '今日訓練已完成 🎉',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: kTierBeginner,
+                  ),
+                ),
+                Text(
+                  '很棒哦！繼續保持這個節奏！',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: kTextSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Today card ──────────────────────────────────────────────────────────────
 
 class _TodayCard extends StatelessWidget {
-  const _TodayCard({required this.exercises});
+  const _TodayCard({required this.exercises, this.isCompleted = false});
 
   final List<ExerciseType> exercises;
+  final bool isCompleted;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: kBgSurface,
+        color: isCompleted
+            ? kTierBeginner.withValues(alpha: 0.05)
+            : kBgSurface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: kBorderSubtle),
+        border: Border.all(
+          color: isCompleted
+              ? kTierBeginner.withValues(alpha: 0.3)
+              : kBorderSubtle,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -618,15 +716,19 @@ class _TodayCard extends StatelessWidget {
           // Label row
           Row(
             children: [
-              const Text(
-                '今日計畫',
+              Text(
+                isCompleted ? '今日已完成' : '今日計畫',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: kTextSecondary,
+                  color: isCompleted ? kTierBeginner : kTextSecondary,
                   letterSpacing: 0.2,
                 ),
               ),
+              if (isCompleted) ...[
+                const SizedBox(width: 4),
+                const Text('✅', style: TextStyle(fontSize: 12)),
+              ],
               const Spacer(),
               Text(
                 '${exercises.length} 個動作',
@@ -642,7 +744,9 @@ class _TodayCard extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: exercises.map((e) => _ExercisePill(type: e)).toList(),
+            children: exercises
+                .map((e) => _ExercisePill(type: e, isCompleted: isCompleted))
+                .toList(),
           ),
         ],
       ),
@@ -651,18 +755,25 @@ class _TodayCard extends StatelessWidget {
 }
 
 class _ExercisePill extends StatelessWidget {
-  const _ExercisePill({required this.type});
+  const _ExercisePill({required this.type, this.isCompleted = false});
 
   final ExerciseType type;
+  final bool isCompleted;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: kBgSurface2,
+        color: isCompleted
+            ? kTierBeginner.withValues(alpha: 0.10)
+            : kBgSurface2,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kBorderDefault),
+        border: Border.all(
+          color: isCompleted
+              ? kTierBeginner.withValues(alpha: 0.35)
+              : kBorderDefault,
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -671,10 +782,10 @@ class _ExercisePill extends StatelessWidget {
           const SizedBox(width: 5),
           Text(
             type.nameZh,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: kTextPrimary,
+              color: isCompleted ? kTierBeginner : kTextPrimary,
             ),
           ),
         ],
