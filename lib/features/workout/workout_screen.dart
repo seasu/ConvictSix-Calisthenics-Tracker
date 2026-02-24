@@ -89,6 +89,13 @@ class _PlanRow extends ConsumerWidget {
     final exercise = exerciseForType(type);
     final stepInfo = exercise.stepAt(step);
     final tierColor = stepTierColor(step);
+    final trainingLevel =
+        ref.watch(progressionProvider).trainingLevelFor(type);
+    final targetStandard = trainingLevel == 0
+        ? stepInfo.beginner
+        : trainingLevel == 1
+            ? stepInfo.intermediate
+            : stepInfo.progression;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -141,7 +148,7 @@ class _PlanRow extends ConsumerWidget {
             ),
           ),
           Text(
-            stepInfo.progression.display,
+            targetStandard.display,
             style: TextStyle(
               fontSize: 12,
               color: tierColor,
@@ -458,7 +465,7 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
                         ],
                       ),
                     ),
-                    // Target
+                    // Target (reflects selected training level)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
@@ -466,7 +473,7 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
                             style: TextStyle(
                                 fontSize: 10, color: kTextTertiary)),
                         Text(
-                          step.progression.display,
+                          targetStandard.display,
                           style: TextStyle(
                             fontSize: 12,
                             color: tierColor,
