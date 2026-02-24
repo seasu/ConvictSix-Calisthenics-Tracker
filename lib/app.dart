@@ -17,11 +17,6 @@ class ConvictSixApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
       home: const MainNavigationScreen(),
-      locale: const Locale('zh', 'TW'),
-      supportedLocales: const [
-        Locale('zh', 'TW'),
-        Locale('en'),
-      ],
     );
   }
 }
