@@ -4,8 +4,10 @@ import 'package:uuid/uuid.dart';
 
 import '../models/exercise.dart';
 import '../models/training_schedule.dart';
+import '../models/user_profile.dart';
 import '../models/user_progression.dart';
 import '../models/workout_session.dart';
+import '../repositories/profile_repository.dart';
 import '../repositories/progression_repository.dart';
 import '../repositories/workout_repository.dart';
 
@@ -18,14 +20,82 @@ final sharedPreferencesProvider = Provider<SharedPreferences>(
 
 const _uuid = Uuid();
 
-// ─── Repositories ─────────────────────────────────────────────────────────────
+// ─── Profile / Multi-user ─────────────────────────────────────────────────────
+
+final profileRepositoryProvider = Provider<ProfileRepository>(
+  (ref) => ProfileRepository(ref.watch(sharedPreferencesProvider)),
+);
+
+class ProfilesNotifier extends Notifier<List<UserProfile>> {
+  @override
+  List<UserProfile> build() {
+    return ref.read(profileRepositoryProvider).loadProfiles();
+  }
+
+  Future<UserProfile> addProfile(String name) async {
+    final profile = UserProfile(
+      id: _uuid.v4(),
+      name: name.trim().isEmpty ? '使用者' : name.trim(),
+      createdAt: DateTime.now(),
+    );
+    final updated = [...state, profile];
+    state = updated;
+    await ref.read(profileRepositoryProvider).saveProfiles(updated);
+    return profile;
+  }
+
+  Future<void> deleteProfile(String id) async {
+    final updated = state.where((p) => p.id != id).toList();
+    state = updated;
+    await ref.read(profileRepositoryProvider).saveProfiles(updated);
+  }
+
+  Future<void> renameProfile(String id, String name) async {
+    final trimmed = name.trim().isEmpty ? '使用者' : name.trim();
+    final updated = state
+        .map((p) => p.id == id ? p.copyWith(name: trimmed) : p)
+        .toList();
+    state = updated;
+    await ref.read(profileRepositoryProvider).saveProfiles(updated);
+  }
+}
+
+final profilesProvider =
+    NotifierProvider<ProfilesNotifier, List<UserProfile>>(
+  ProfilesNotifier.new,
+);
+
+// ─── Active user ──────────────────────────────────────────────────────────────
+
+class ActiveUserNotifier extends Notifier<String> {
+  @override
+  String build() {
+    return ref.read(profileRepositoryProvider).loadActiveUserId() ?? '';
+  }
+
+  Future<void> switchUser(String userId) async {
+    state = userId;
+    await ref.read(profileRepositoryProvider).saveActiveUserId(userId);
+  }
+}
+
+final activeUserIdProvider =
+    NotifierProvider<ActiveUserNotifier, String>(ActiveUserNotifier.new);
+
+// ─── Repositories (user-scoped) ───────────────────────────────────────────────
 
 final progressionRepositoryProvider = Provider<ProgressionRepository>(
-  (ref) => ProgressionRepository(ref.watch(sharedPreferencesProvider)),
+  (ref) => ProgressionRepository(
+    ref.watch(sharedPreferencesProvider),
+    ref.watch(activeUserIdProvider),
+  ),
 );
 
 final workoutRepositoryProvider = Provider<WorkoutRepository>(
-  (ref) => WorkoutRepository(ref.watch(sharedPreferencesProvider)),
+  (ref) => WorkoutRepository(
+    ref.watch(sharedPreferencesProvider),
+    ref.watch(activeUserIdProvider),
+  ),
 );
 
 // ─── User Progression ─────────────────────────────────────────────────────────
@@ -33,7 +103,8 @@ final workoutRepositoryProvider = Provider<WorkoutRepository>(
 class ProgressionNotifier extends Notifier<UserProgression> {
   @override
   UserProgression build() {
-    return ref.read(progressionRepositoryProvider).loadProgression();
+    // watch so this rebuilds when the active user changes
+    return ref.watch(progressionRepositoryProvider).loadProgression();
   }
 
   Future<void> setStep(ExerciseType type, int step) async {
@@ -57,7 +128,7 @@ final progressionProvider =
 class ScheduleNotifier extends Notifier<TrainingSchedule> {
   @override
   TrainingSchedule build() {
-    return ref.read(progressionRepositoryProvider).loadSchedule();
+    return ref.watch(progressionRepositoryProvider).loadSchedule();
   }
 
   Future<void> updateDay(DaySchedule day) async {
@@ -81,7 +152,7 @@ final scheduleProvider =
 class ActiveWorkoutNotifier extends Notifier<WorkoutSession?> {
   @override
   WorkoutSession? build() {
-    return ref.read(workoutRepositoryProvider).loadActiveSession();
+    return ref.watch(workoutRepositoryProvider).loadActiveSession();
   }
 
   Future<void> startWorkout() async {
@@ -140,7 +211,7 @@ final activeWorkoutProvider =
 class HistoryNotifier extends Notifier<List<WorkoutSession>> {
   @override
   List<WorkoutSession> build() {
-    return ref.read(workoutRepositoryProvider).loadHistory();
+    return ref.watch(workoutRepositoryProvider).loadHistory();
   }
 
   void reload() {
