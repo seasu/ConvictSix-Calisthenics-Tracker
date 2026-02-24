@@ -167,7 +167,7 @@ class CharacterPainter extends CustomPainter {
   void _drawNeck(Canvas canvas) {
     final paint = Paint()..color = _skin;
     canvas.drawRect(
-      Rect.fromLTWH(_cx - 6, _hy + _hr - 2, 12, 10),
+      const Rect.fromLTWH(_cx - 6, _hy + _hr - 2, 12, 10),
       paint,
     );
   }
@@ -176,7 +176,7 @@ class CharacterPainter extends CustomPainter {
 
   void _drawBodyAnimal(Canvas canvas) {
     final paint = Paint()..color = _skin;
-    final bodyTop = _hy + _hr - 6.0;
+    const bodyTop = _hy + _hr - 6.0;
     canvas.drawRRect(
       RRect.fromRectAndRadius(
         Rect.fromLTWH(_bl, bodyTop, _bw, _bh),
@@ -229,18 +229,22 @@ class CharacterPainter extends CustomPainter {
         // Side strands
         canvas.drawOval(
           Rect.fromCenter(
-              center: Offset(_cx - _hr - 1, _hy + 6), width: 13, height: 30),
+              center: const Offset(_cx - _hr - 1, _hy + 6),
+              width: 13,
+              height: 30),
           paint,
         );
         canvas.drawOval(
           Rect.fromCenter(
-              center: Offset(_cx + _hr + 1, _hy + 6), width: 13, height: 30),
+              center: const Offset(_cx + _hr + 1, _hy + 6),
+              width: 13,
+              height: 30),
           paint,
         );
       case CharacterType.child:
         canvas.drawArc(
           Rect.fromCenter(
-              center: Offset(_cx, _hy - 4),
+              center: const Offset(_cx, _hy - 4),
               width: _hr * 2 + 6,
               height: _hr * 1.4),
           math.pi,
@@ -298,12 +302,16 @@ class CharacterPainter extends CustomPainter {
     final paint = Paint()..color = _skin;
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(_cx - _hr * 1.1, _hy + 6), width: 18, height: 32),
+          center: const Offset(_cx - _hr * 1.1, _hy + 6),
+          width: 18,
+          height: 32),
       paint,
     );
     canvas.drawOval(
       Rect.fromCenter(
-          center: Offset(_cx + _hr * 1.1, _hy + 6), width: 18, height: 32),
+          center: const Offset(_cx + _hr * 1.1, _hy + 6),
+          width: 18,
+          height: 32),
       paint,
     );
   }
@@ -408,13 +416,13 @@ class CharacterPainter extends CustomPainter {
       canvas.drawPath(nosePath, Paint()..color = const Color(0xFFEF9A9A));
     } else if (type == CharacterType.dog) {
       canvas.drawOval(
-        Rect.fromCenter(
+        const Rect.fromCenter(
             center: Offset(_cx, _hy + 7), width: 10, height: 7),
         Paint()..color = const Color(0xFF4E342E),
       );
     } else {
       // Human small nose dot
-      canvas.drawCircle(Offset(_cx, _hy + 7), 1.8,
+      canvas.drawCircle(const Offset(_cx, _hy + 7), 1.8,
           Paint()..color = const Color(0xFFBCAAA4));
     }
 
@@ -427,8 +435,8 @@ class CharacterPainter extends CustomPainter {
         canvas.drawPath(p, stroke);
       case 2:
         canvas.drawLine(
-            Offset(_cx - w / 2, baseY + 1),
-            Offset(_cx + w / 2, baseY + 1),
+            const Offset(_cx - w / 2, baseY + 1),
+            const Offset(_cx + w / 2, baseY + 1),
             stroke);
       case 3:
         final p = Path()
@@ -451,7 +459,7 @@ class CharacterPainter extends CustomPainter {
         canvas.drawPath(fill, Paint()..color = const Color(0xFF212121));
         // Teeth
         canvas.drawRect(
-          Rect.fromLTWH(_cx - 5, baseY + 0.5, 10, 4),
+          const Rect.fromLTWH(_cx - 5, baseY + 0.5, 10, 4),
           Paint()..color = Colors.white,
         );
     }
@@ -459,7 +467,7 @@ class CharacterPainter extends CustomPainter {
     // Dog tongue at stage 3+
     if (type == CharacterType.dog && stage >= 3) {
       canvas.drawOval(
-        Rect.fromCenter(
+        const Rect.fromCenter(
             center: Offset(_cx, baseY + 7), width: 9, height: 11),
         Paint()..color = const Color(0xFFEF9A9A),
       );
@@ -484,11 +492,11 @@ class CharacterPainter extends CustomPainter {
   void _drawBlush(Canvas canvas) {
     final p = Paint()..color = const Color(0xFFEF9A9A).withValues(alpha: 0.5);
     canvas.drawOval(
-        Rect.fromCenter(
+        const Rect.fromCenter(
             center: Offset(_cx - 18, _hy + 9), width: 14, height: 8),
         p);
     canvas.drawOval(
-        Rect.fromCenter(
+        const Rect.fromCenter(
             center: Offset(_cx + 18, _hy + 9), width: 14, height: 8),
         p);
   }
@@ -563,7 +571,7 @@ class CharacterPainter extends CustomPainter {
       ..color = const Color(0xFFFF8F00)
       ..strokeWidth = 1.2
       ..style = PaintingStyle.stroke;
-    final top = _hy - _hr - 15.0;
+    const top = _hy - _hr - 15.0;
     final path = Path()
       ..moveTo(_cx - 17, top + 11)
       ..lineTo(_cx - 17, top)
