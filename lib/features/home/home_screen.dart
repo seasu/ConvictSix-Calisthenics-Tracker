@@ -10,7 +10,7 @@ import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.3.1';
+const _kAppVersion = 'v1.3.2';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -43,20 +43,13 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
 
-            // ── Active session banner / today done banner ─────────────────────
+            // ── Active session banner ─────────────────────────────────────────
             if (activeSession != null)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: _ActiveSessionBanner(
                       setCount: activeSession.sets.length),
-                ),
-              )
-            else if (todayCompleted)
-              const SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
-                  child: _TodayCompletedBanner(),
                 ),
               ),
 
@@ -626,61 +619,6 @@ class _ActiveSessionBanner extends StatelessWidget {
             ),
           ),
           const Icon(Icons.chevron_right, color: kTextTertiary, size: 20),
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Today completed banner ───────────────────────────────────────────────────
-
-class _TodayCompletedBanner extends StatelessWidget {
-  const _TodayCompletedBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: kTierBeginner.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: kTierBeginner.withValues(alpha: 0.35)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: kTierBeginner.withValues(alpha: 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.check_circle_rounded,
-                color: kTierBeginner, size: 20),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '今日訓練已完成 🎉',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: kTierBeginner,
-                  ),
-                ),
-                Text(
-                  '很棒哦！繼續保持這個節奏！',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: kTextSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
