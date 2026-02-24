@@ -23,7 +23,7 @@ import requests
 API_KEY = os.environ.get("GEMINI_API_KEY", "")
 IMAGEN_URL = (
     "https://generativelanguage.googleapis.com/v1beta"
-    "/models/imagen-3.0-generate-001:predict"
+    "/models/gemini-2.5-flash-image:generateContent"
 )
 OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "images" / "exercises"
 PROMPTS_FILE = Path(__file__).parent.parent / "docs" / "image_prompts.md"
@@ -68,28 +68,38 @@ def parse_prompts(md_path: Path) -> list[dict]:
 # ── Gemini Imagen API call ────────────────────────────────────────────────────
 
 def generate_image(prompt: str) -> bytes:
-    """Call Imagen 3 and return raw JPEG bytes."""
+    """Call Gemini 2.5 Flash Image (Nano Banana) and return JPEG bytes."""
     full_prompt = GLOBAL_STYLE + prompt
     payload = {
-        "instances": [{"prompt": full_prompt}],
-        "parameters": {
-            "sampleCount": 1,
-            "aspectRatio": "1:1",
-        },
+        "contents": [{"parts": [{"text": full_prompt}]}],
+        "generationConfig": {"responseModalities": ["IMAGE"], "imageConfig": {"aspectRatio": "1:1"}},
     }
     resp = requests.post(
         IMAGEN_URL,
         params={"key": API_KEY},
         json=payload,
-        timeout=60,
+        timeout=120,
     )
     if resp.status_code != 200:
         raise RuntimeError(
             f"API error {resp.status_code}: {resp.text[:300]}"
         )
     data = resp.json()
-    b64 = data["predictions"][0]["bytesBase64Encoded"]
-    return base64.b64decode(b64)
+    parts = data["candidates"][0]["content"]["parts"]
+    for part in parts:
+        if "inlineData" in part:
+            raw = base64.b64decode(part["inlineData"]["data"])
+            mime = part["inlineData"].get("mimeType", "image/png")
+            # Response is PNG; convert to JPEG so filenames stay *.jpg
+            if mime != "image/jpeg":
+                from PIL import Image
+                import io as _io
+                img = Image.open(_io.BytesIO(raw)).convert("RGB")
+                buf = _io.BytesIO()
+                img.save(buf, format="JPEG", quality=90)
+                return buf.getvalue()
+            return raw
+    raise RuntimeError("No image data in response")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
