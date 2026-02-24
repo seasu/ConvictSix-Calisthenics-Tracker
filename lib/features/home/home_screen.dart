@@ -10,7 +10,7 @@ import '../../shared/theme/app_theme.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.3.0';
+const _kAppVersion = 'v1.3.1';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -67,7 +67,7 @@ class HomeScreen extends ConsumerWidget {
                 child: todayExercises.isNotEmpty
                     ? _TodayCard(
                         exercises: todayExercises,
-                        isCompleted: todayCompleted,
+                        isCompleted: todayCompleted && activeSession == null,
                       )
                     : const _RestDayCard(),
               ),
