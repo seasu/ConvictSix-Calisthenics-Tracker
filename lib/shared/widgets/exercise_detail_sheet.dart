@@ -122,7 +122,7 @@ class ExerciseDetailSheet extends StatelessWidget {
                       const SizedBox(height: 22),
 
                       // Description
-                      _SectionLabel('動作說明'),
+                      const _SectionLabel('動作說明'),
                       const SizedBox(height: 8),
                       Text(
                         step.description,
@@ -135,7 +135,7 @@ class ExerciseDetailSheet extends StatelessWidget {
                       const SizedBox(height: 24),
 
                       // Training standards
-                      _SectionLabel('訓練標準'),
+                      const _SectionLabel('訓練標準'),
                       const SizedBox(height: 10),
                       _StandardsRow(step: step, tierColor: tierColor),
                     ],
