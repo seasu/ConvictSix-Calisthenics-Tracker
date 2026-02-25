@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../data/models/exercise.dart';
 import '../../shared/constants/exercises_data.dart';
@@ -8,7 +9,9 @@ import 'step_dots.dart';
 /// Modal bottom sheet showing exercise photo, description, and training
 /// standards for a specific progression step.
 ///
-/// The user can navigate between steps 1–10 with the ← / → buttons.
+/// The user can navigate between steps 1–10 by:
+///   • Tapping the left / right ghost-arrow overlaid on the photo
+///   • Swiping left / right on the photo
 ///
 /// Photo loading follows the convention:
 ///   assets/images/exercises/{exerciseTypeName}_{stepNumber:02d}_ls.jpg
@@ -50,6 +53,7 @@ class _ExerciseDetailSheetState extends State<ExerciseDetailSheet> {
 
   void _goTo(int step) {
     if (step < 1 || step > 10) return;
+    HapticFeedback.selectionClick();
     _scrollController?.jumpTo(0);
     setState(() => _step = step);
   }
@@ -93,11 +97,13 @@ class _ExerciseDetailSheetState extends State<ExerciseDetailSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Photo area
-                      _PhotoArea(
+                      // Photo area with swipe navigation
+                      _SwipeablePhoto(
                         exercise: exercise,
-                        stepNumber: _step,
+                        step: _step,
                         tierColor: tierColor,
+                        onPrev: _step > 1 ? () => _goTo(_step - 1) : null,
+                        onNext: _step < 10 ? () => _goTo(_step + 1) : null,
                       ),
                       const SizedBox(height: 20),
 
@@ -120,40 +126,21 @@ class _ExerciseDetailSheetState extends State<ExerciseDetailSheet> {
                           TierBadge(step: _step),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
 
-                      // ── Step navigation row: ← 第 N 式 · Name → ─────────
-                      Row(
-                        children: [
-                          _NavArrow(
-                            icon: Icons.chevron_left_rounded,
-                            enabled: _step > 1,
-                            tierColor: tierColor,
-                            onTap: () => _goTo(_step - 1),
-                          ),
-                          Expanded(
-                            child: Text(
-                              '第 $_step 式 · ${step.nameZh}',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: tierColor,
-                              ),
-                            ),
-                          ),
-                          _NavArrow(
-                            icon: Icons.chevron_right_rounded,
-                            enabled: _step < 10,
-                            tierColor: tierColor,
-                            onTap: () => _goTo(_step + 1),
-                          ),
-                        ],
+                      // Step subtitle
+                      Text(
+                        '第 $_step 式 · ${step.nameZh}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: tierColor,
+                        ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 14),
 
                       // Step progress dots
-                      Center(child: StepDots(currentStep: _step)),
+                      StepDots(currentStep: _step),
                       const SizedBox(height: 22),
 
                       // Description
@@ -185,83 +172,140 @@ class _ExerciseDetailSheetState extends State<ExerciseDetailSheet> {
   }
 }
 
-// ─── Step navigation arrow ────────────────────────────────────────────────────
+// ─── Swipeable photo with overlay arrows ──────────────────────────────────────
 
-class _NavArrow extends StatelessWidget {
-  const _NavArrow({
-    required this.icon,
-    required this.enabled,
-    required this.tierColor,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final bool enabled;
-  final Color tierColor;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled ? onTap : null,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: enabled
-              ? tierColor.withValues(alpha: 0.12)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Icon(
-          icon,
-          size: 20,
-          color: enabled ? tierColor : kTextTertiary,
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Photo area ───────────────────────────────────────────────────────────────
-
-class _PhotoArea extends StatelessWidget {
-  const _PhotoArea({
+class _SwipeablePhoto extends StatelessWidget {
+  const _SwipeablePhoto({
     required this.exercise,
-    required this.stepNumber,
+    required this.step,
     required this.tierColor,
+    required this.onPrev,
+    required this.onNext,
   });
 
   final Exercise exercise;
-  final int stepNumber;
+  final int step;
   final Color tierColor;
+  final VoidCallback? onPrev;
+  final VoidCallback? onNext;
 
   @override
   Widget build(BuildContext context) {
-    // Convention: assets/images/exercises/{typeName}_{step:02d}_ls.jpg
-    // Landscape (16:9) images are used here for the full-width banner.
-    // Square (_sq.jpg) images are used for thumbnails in workout_screen.dart.
     final assetPath =
-        'assets/images/exercises/${exercise.type.name}_${stepNumber.toString().padLeft(2, '0')}_ls.jpg';
+        'assets/images/exercises/${exercise.type.name}_${step.toString().padLeft(2, '0')}_ls.jpg';
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: SizedBox(
-        height: 230,
-        width: double.infinity,
-        child: Image.asset(
-          assetPath,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _PhotoPlaceholder(
-            exercise: exercise,
-            stepNumber: stepNumber,
-            tierColor: tierColor,
+    return GestureDetector(
+      // Swipe left = next step, swipe right = previous step
+      onHorizontalDragEnd: (details) {
+        final v = details.primaryVelocity ?? 0;
+        if (v < -300) onNext?.call();
+        if (v > 300) onPrev?.call();
+      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: SizedBox(
+          height: 230,
+          width: double.infinity,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // ── Photo / placeholder ──────────────────────────────────
+              Image.asset(
+                assetPath,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => _PhotoPlaceholder(
+                  exercise: exercise,
+                  stepNumber: step,
+                  tierColor: tierColor,
+                ),
+              ),
+
+              // ── Previous arrow (left) ────────────────────────────────
+              if (onPrev != null)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: GestureDetector(
+                    onTap: onPrev,
+                    child: Container(
+                      width: 56,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.black.withValues(alpha: 0.45),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.chevron_left_rounded,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // ── Next arrow (right) ───────────────────────────────────
+              if (onNext != null)
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: GestureDetector(
+                    onTap: onNext,
+                    child: Container(
+                      width: 56,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.transparent,
+                            Colors.black.withValues(alpha: 0.45),
+                          ],
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.chevron_right_rounded,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                  ),
+                ),
+
+              // ── Step counter badge (top-left) ────────────────────────
+              Positioned(
+                top: 12,
+                left: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.55),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$step / 10',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 }
+
+// ─── Photo placeholder ────────────────────────────────────────────────────────
 
 class _PhotoPlaceholder extends StatelessWidget {
   const _PhotoPlaceholder({
