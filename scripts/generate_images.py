@@ -2,11 +2,15 @@
 """
 Generate exercise illustration images via Gemini Imagen API.
 
+Reads prompts from docs/image_prompts.md and generates two formats per step:
+  - *_sq.jpg  → 1:1  square  (used for thumbnail widgets)
+  - *_ls.jpg  → 16:9 landscape (used for the detail-sheet banner)
+
 Usage:
     export GEMINI_API_KEY=AIza...
     python3 scripts/generate_images.py
 
-Output: assets/images/exercises/{exerciseType}_{step:02d}.jpg
+Output: assets/images/exercises/{exerciseType}_{step:02d}_{format}.jpg
 """
 
 import base64
@@ -29,11 +33,15 @@ OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "images" / "exercises"
 PROMPTS_FILE = Path(__file__).parent.parent / "docs" / "image_prompts.md"
 
 GLOBAL_STYLE = (
-    "Flat design athletic illustration, minimalist cartoon figure "
-    "(gender-neutral), dark background color #111111, figure in white/light "
-    "grey, orange accent color #FF5722 used for motion arrows or highlights, "
-    "simple bold shapes with no facial details, clean confident lines, sports "
-    "training app icon style, square 1:1 format, no text or labels. "
+    "Minimalist calisthenics exercise illustration for a fitness app. "
+    "Smooth, slightly volumetric white figure with subtle grey shading on a "
+    "solid deep-charcoal background (#1C1C1C). No rounded corners, no border, "
+    "no frame, no vignette. Orange (#FF5722) curved motion arrows with "
+    "arrowheads showing movement direction; orange accent stripe or glow on "
+    "the primary working muscles or joints. Simple flat light-grey structural "
+    "prop only when essential (wall face, horizontal bar, or thin floor line). "
+    "No face details, no text, no labels. Bold, high-contrast, "
+    "vector-render style. "
 )
 
 # Seconds to wait between API calls to avoid rate-limiting
@@ -44,35 +52,49 @@ REQUEST_DELAY = 2
 
 def parse_prompts(md_path: Path) -> list[dict]:
     """
-    Returns a list of dicts: {"filename": "pushUp_01.jpg", "prompt": "..."}.
+    Returns a list of dicts: {"filename": "pushUp_01_sq.jpg", "prompt": "..."}.
+
     Parses blocks of the form:
-        ### pushUp_01.jpg — 壁上推 Wall Push-up
+        ### pushUp_01_sq.jpg — 壁上推 Wall Push-up (方形)
         ```
         ...prompt text...
         ```
+    Filenames ending in _sq.jpg get aspectRatio "1:1".
+    Filenames ending in _ls.jpg get aspectRatio "16:9".
     """
     text = md_path.read_text(encoding="utf-8")
     # Match  ### filename.jpg — ... \n ``` \n <prompt> \n ```
     pattern = re.compile(
-        r"###\s+(\w+_\d{2}\.jpg)[^\n]*\n```\n(.*?)\n```",
+        r"###\s+([\w]+\.jpg)[^\n]*\n```\n(.*?)\n```",
         re.DOTALL,
     )
     entries = []
     for m in pattern.finditer(text):
         filename = m.group(1)
         prompt = " ".join(m.group(2).split())  # collapse whitespace
-        entries.append({"filename": filename, "prompt": prompt})
+        if filename.endswith("_ls.jpg"):
+            aspect = "16:9"
+        else:
+            aspect = "1:1"
+        entries.append({
+            "filename": filename,
+            "prompt": prompt,
+            "aspect": aspect,
+        })
     return entries
 
 
 # ── Gemini Imagen API call ────────────────────────────────────────────────────
 
-def generate_image(prompt: str) -> bytes:
-    """Call Gemini 2.5 Flash Image (Nano Banana) and return JPEG bytes."""
+def generate_image(prompt: str, aspect: str) -> bytes:
+    """Call Gemini 2.5 Flash Image and return JPEG bytes."""
     full_prompt = GLOBAL_STYLE + prompt
     payload = {
         "contents": [{"parts": [{"text": full_prompt}]}],
-        "generationConfig": {"responseModalities": ["IMAGE"], "imageConfig": {"aspectRatio": "1:1"}},
+        "generationConfig": {
+            "responseModalities": ["IMAGE"],
+            "imageConfig": {"aspectRatio": aspect},
+        },
     }
     resp = requests.post(
         IMAGEN_URL,
@@ -90,7 +112,7 @@ def generate_image(prompt: str) -> bytes:
         if "inlineData" in part:
             raw = base64.b64decode(part["inlineData"]["data"])
             mime = part["inlineData"].get("mimeType", "image/png")
-            # Response is PNG; convert to JPEG so filenames stay *.jpg
+            # Response may be PNG; convert to JPEG so filenames stay *.jpg
             if mime != "image/jpeg":
                 from PIL import Image
                 import io as _io
@@ -124,18 +146,23 @@ def main() -> None:
 
     for i, entry in enumerate(entries, 1):
         filename = entry["filename"]
+        aspect   = entry["aspect"]
         out_path = OUTPUT_DIR / filename
 
         if out_path.exists():
-            print(f"[{i:02d}/{len(entries)}] SKIP  {filename}  (already exists)")
+            print(f"[{i:03d}/{len(entries)}] SKIP  {filename}  (already exists)")
             success += 1
             continue
 
-        print(f"[{i:02d}/{len(entries)}] GEN   {filename} ...", end=" ", flush=True)
+        print(
+            f"[{i:03d}/{len(entries)}] GEN   {filename} [{aspect}] ...",
+            end=" ",
+            flush=True,
+        )
         try:
-            image_bytes = generate_image(entry["prompt"])
+            image_bytes = generate_image(entry["prompt"], aspect)
             out_path.write_bytes(image_bytes)
-            print(f"OK ({len(image_bytes)//1024} KB)")
+            print(f"OK ({len(image_bytes) // 1024} KB)")
             success += 1
         except Exception as exc:
             print(f"FAIL — {exc}")

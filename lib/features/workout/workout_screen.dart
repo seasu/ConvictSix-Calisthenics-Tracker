@@ -130,7 +130,7 @@ class _PlanRow extends ConsumerWidget {
               width: 50,
               height: 50,
               child: Image.asset(
-                'assets/images/exercises/${type.name}_${step.toString().padLeft(2, '0')}.jpg',
+                'assets/images/exercises/${type.name}_${step.toString().padLeft(2, '0')}_sq.jpg',
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   color: tierColor.withValues(alpha: 0.12),
@@ -445,7 +445,7 @@ class _ExerciseBlockState extends ConsumerState<_ExerciseBlock> {
         _isHoldStep ? targetStandard.holdSeconds : targetStandard.reps;
 
     final imagePath =
-        'assets/images/exercises/${exercise.type.name}_${widget.currentStep.toString().padLeft(2, '0')}.jpg';
+        'assets/images/exercises/${exercise.type.name}_${widget.currentStep.toString().padLeft(2, '0')}_sq.jpg';
 
     return Container(
       decoration: BoxDecoration(
