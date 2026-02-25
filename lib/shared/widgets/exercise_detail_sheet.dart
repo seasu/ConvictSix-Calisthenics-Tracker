@@ -165,11 +165,11 @@ class _PhotoArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Convention: assets/images/exercises/{typeName}_{step:02d}.jpg
-    // Add image files + declare assets/images/exercises/ in pubspec.yaml
-    // to replace the placeholder automatically with no further code changes.
+    // Convention: assets/images/exercises/{typeName}_{step:02d}_ls.jpg
+    // Landscape (16:9) images are used here for the full-width banner.
+    // Square (_sq.jpg) images are used for thumbnails in workout_screen.dart.
     final assetPath =
-        'assets/images/exercises/${exercise.type.name}_${stepNumber.toString().padLeft(2, '0')}.jpg';
+        'assets/images/exercises/${exercise.type.name}_${stepNumber.toString().padLeft(2, '0')}_ls.jpg';
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
