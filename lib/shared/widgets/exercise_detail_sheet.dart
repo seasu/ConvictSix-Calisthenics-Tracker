@@ -8,14 +8,12 @@ import 'step_dots.dart';
 /// Modal bottom sheet showing exercise photo, description, and training
 /// standards for a specific progression step.
 ///
-/// Photo loading follows the convention:
-///   assets/images/exercises/{exerciseTypeName}_{stepNumber:02d}.jpg
-/// e.g. assets/images/exercises/pushUp_01.jpg
+/// The user can navigate between steps 1–10 with the ← / → buttons.
 ///
-/// When no photo file exists the sheet shows a styled placeholder; no code
-/// change is needed once real photos are dropped in (just declare the
-/// directory in pubspec.yaml and rebuild).
-class ExerciseDetailSheet extends StatelessWidget {
+/// Photo loading follows the convention:
+///   assets/images/exercises/{exerciseTypeName}_{stepNumber:02d}_ls.jpg
+/// When no photo file exists the sheet shows a styled placeholder.
+class ExerciseDetailSheet extends StatefulWidget {
   const ExerciseDetailSheet({
     super.key,
     required this.type,
@@ -37,16 +35,37 @@ class ExerciseDetailSheet extends StatelessWidget {
   }
 
   @override
+  State<ExerciseDetailSheet> createState() => _ExerciseDetailSheetState();
+}
+
+class _ExerciseDetailSheetState extends State<ExerciseDetailSheet> {
+  late int _step;
+  ScrollController? _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _step = widget.stepNumber;
+  }
+
+  void _goTo(int step) {
+    if (step < 1 || step > 10) return;
+    _scrollController?.jumpTo(0);
+    setState(() => _step = step);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final exercise = exerciseForType(type);
-    final step = exercise.stepAt(stepNumber);
-    final tierColor = stepTierColor(stepNumber);
+    final exercise = exerciseForType(widget.type);
+    final step = exercise.stepAt(_step);
+    final tierColor = stepTierColor(_step);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.78,
       minChildSize: 0.5,
       maxChildSize: 0.93,
       builder: (context, scrollController) {
+        _scrollController = scrollController;
         return Container(
           decoration: const BoxDecoration(
             color: kBgSurface,
@@ -77,48 +96,64 @@ class ExerciseDetailSheet extends StatelessWidget {
                       // Photo area
                       _PhotoArea(
                         exercise: exercise,
-                        stepNumber: stepNumber,
+                        stepNumber: _step,
                         tierColor: tierColor,
                       ),
                       const SizedBox(height: 20),
 
-                      // Header: name + tier badge
+                      // Exercise name + tier badge
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  exercise.nameZh,
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: kTextPrimary,
-                                    letterSpacing: -0.3,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '第 $stepNumber 式 · ${step.nameZh}',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: tierColor,
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              exercise.nameZh,
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                color: kTextPrimary,
+                                letterSpacing: -0.3,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
-                          TierBadge(step: stepNumber),
+                          TierBadge(step: _step),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 8),
+
+                      // ── Step navigation row: ← 第 N 式 · Name → ─────────
+                      Row(
+                        children: [
+                          _NavArrow(
+                            icon: Icons.chevron_left_rounded,
+                            enabled: _step > 1,
+                            tierColor: tierColor,
+                            onTap: () => _goTo(_step - 1),
+                          ),
+                          Expanded(
+                            child: Text(
+                              '第 $_step 式 · ${step.nameZh}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: tierColor,
+                              ),
+                            ),
+                          ),
+                          _NavArrow(
+                            icon: Icons.chevron_right_rounded,
+                            enabled: _step < 10,
+                            tierColor: tierColor,
+                            onTap: () => _goTo(_step + 1),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
 
                       // Step progress dots
-                      StepDots(currentStep: stepNumber),
+                      Center(child: StepDots(currentStep: _step)),
                       const SizedBox(height: 22),
 
                       // Description
@@ -146,6 +181,44 @@ class ExerciseDetailSheet extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+// ─── Step navigation arrow ────────────────────────────────────────────────────
+
+class _NavArrow extends StatelessWidget {
+  const _NavArrow({
+    required this.icon,
+    required this.enabled,
+    required this.tierColor,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final Color tierColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: enabled
+              ? tierColor.withValues(alpha: 0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          size: 20,
+          color: enabled ? tierColor : kTextTertiary,
+        ),
+      ),
     );
   }
 }
