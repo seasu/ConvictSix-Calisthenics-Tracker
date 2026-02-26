@@ -362,18 +362,26 @@ arrows at the knees point outward. Landscape 16:9, figure centred.
 
 ### squat_07_sq.jpg — 偏重深蹲 Uneven Squat (方形)
 ```
-Figure squatting with one foot planted flat on the floor and the other foot
-raised on a round ball to the side, weight distributed unevenly, at the
-bottom of an asymmetric squat. 3/4 view. Orange highlight on the loaded
-knee. Square 1:1, figure centred.
+Figure at the bottom of an uneven squat, side view: one foot planted flat
+on the floor (the working leg), knee deeply bent and close to the floor.
+The other foot rests on top of a basketball sitting on the floor to that
+side, that leg fairly straight. Arms hang NATURALLY at the sides — not
+reaching forward or touching the ball. Torso leans slightly forward from
+the deep squat. Side view clearly showing the deeply bent working knee, the
+elevated foot on the ball, and the naturally hanging arms. Orange accent
+glow on the working knee. Square 1:1, figure centred.
 ```
 
 ### squat_07_ls.jpg — 偏重深蹲 Uneven Squat (橫式)
 ```
-Figure squatting with one foot planted flat on the floor and the other foot
-raised on a round ball to the side, weight distributed unevenly, at the
-bottom of an asymmetric squat. 3/4 view. Orange highlight on the loaded
-knee. Landscape 16:9, figure centred.
+Figure at the bottom of an uneven squat, side view: one foot planted flat
+on the floor (the working leg), knee deeply bent and close to the floor.
+The other foot rests on top of a basketball sitting on the floor to that
+side, that leg fairly straight. Arms hang NATURALLY at the sides — not
+reaching forward or touching the ball. Torso leans slightly forward from
+the deep squat. Side view clearly showing the deeply bent working knee, the
+elevated foot on the ball, and the naturally hanging arms. Orange accent
+glow on the working knee. Landscape 16:9, figure centred.
 ```
 
 ### squat_08_sq.jpg — 半單腿深蹲 Half One-Leg Squat (方形)
