@@ -226,18 +226,24 @@ Side view. Orange arc arrow beside the single arm curves upward. Landscape
 
 ### squat_01_sq.jpg — 肩撐深蹲 Shoulderstand Squat (方形)
 ```
-Figure lying on their back, upper body flat on the floor, legs raised
-vertically and supported on shoulders and upper back, both knees bent and
-cycling in a pedaling motion in the air. Side view. Orange arrows on the
-legs show the up-down cycling motion. Square 1:1, figure centred.
+Figure lying on their back in a shoulder stand: upper arms pressed flat on
+the floor, both hands placed under the lower back supporting the hips, which
+are lifted off the floor. BOTH LEGS extend straight up perfectly vertical,
+perpendicular to the ground, toes pointing at the ceiling. Body forms an
+inverted-L shape. Side view clearly showing the flat upper arms, hands under
+the lower back, elevated hips, and the two legs pointing straight up. Orange
+arrows on the legs point upward. Square 1:1, figure centred.
 ```
 
 ### squat_01_ls.jpg — 肩撐深蹲 Shoulderstand Squat (橫式)
 ```
-Figure lying on their back, upper body flat on the floor, legs raised
-vertically and supported on shoulders and upper back, both knees bent and
-cycling in a pedaling motion in the air. Side view. Orange arrows on the
-legs show the up-down cycling motion. Landscape 16:9, figure centred.
+Figure lying on their back in a shoulder stand: upper arms pressed flat on
+the floor, both hands placed under the lower back supporting the hips, which
+are lifted off the floor. BOTH LEGS extend straight up perfectly vertical,
+perpendicular to the ground, toes pointing at the ceiling. Body forms an
+inverted-L shape. Side view clearly showing the flat upper arms, hands under
+the lower back, elevated hips, and the two legs pointing straight up. Orange
+arrows on the legs point upward. Landscape 16:9, figure centred.
 ```
 
 ### squat_02_sq.jpg — 摺刀深蹲 Jackknife Squat (方形)
