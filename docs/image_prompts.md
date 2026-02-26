@@ -296,18 +296,24 @@ upward. Landscape 16:9, figure centred.
 
 ### squat_04_sq.jpg — 半程深蹲 Half Squat (方形)
 ```
-Figure in a squat with feet shoulder-width apart, thighs at a 45-degree
-angle (halfway down), arms extended forward at shoulder height for balance.
-Side view. Orange arc arrow at the knees shows partial bend. Square 1:1,
-figure centred.
+Figure in a half squat viewed from the FRONT: feet shoulder-width apart,
+toes turned slightly outward. Arms CROSSED over the chest (not extended
+forward). Knees bent to approximately 90 degrees so thighs are roughly
+parallel to the floor — halfway between standing and a full squat. Back
+upright. Front view clearly showing the crossed arms, outward-angled toes,
+and the 90-degree knee bend. Orange arc arrows at the knees show the bend
+direction. Square 1:1, figure centred.
 ```
 
 ### squat_04_ls.jpg — 半程深蹲 Half Squat (橫式)
 ```
-Figure in a squat with feet shoulder-width apart, thighs at a 45-degree
-angle (halfway down), arms extended forward at shoulder height for balance.
-Side view. Orange arc arrow at the knees shows partial bend. Landscape 16:9,
-figure centred.
+Figure in a half squat viewed from the FRONT: feet shoulder-width apart,
+toes turned slightly outward. Arms CROSSED over the chest (not extended
+forward). Knees bent to approximately 90 degrees so thighs are roughly
+parallel to the floor — halfway between standing and a full squat. Back
+upright. Front view clearly showing the crossed arms, outward-angled toes,
+and the 90-degree knee bend. Orange arc arrows at the knees show the bend
+direction. Landscape 16:9, figure centred.
 ```
 
 ### squat_05_sq.jpg — 標準深蹲 Full Squat (方形)
