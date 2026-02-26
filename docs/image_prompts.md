@@ -248,17 +248,25 @@ arrows on the legs point upward. Landscape 16:9, figure centred.
 
 ### squat_02_sq.jpg — 摺刀深蹲 Jackknife Squat (方形)
 ```
-Figure in a full deep squat with both hands lightly resting on the back of a
-chair placed in front of them, back straight, thighs below parallel to the
-floor. Side view. Orange arrows at the hips point upward. Square 1:1,
-figure centred.
+Figure at the bottom of a jackknife squat: both hands pressing flat on top
+of a low horizontal bench in front of them, arms straight, upper body
+FOLDED SHARPLY FORWARD — torso nearly parallel to the floor like an open
+jackknife. Hips squatted completely down until hamstrings press against
+calves, heels flat on the floor. The bench is roughly knee height. Side
+view clearly showing the sharp forward fold of the torso and the extreme
+squat depth. Orange arrows at the hips point upward. Square 1:1, figure
+centred.
 ```
 
 ### squat_02_ls.jpg — 摺刀深蹲 Jackknife Squat (橫式)
 ```
-Figure in a full deep squat with both hands lightly resting on the back of a
-chair placed in front of them, back straight, thighs below parallel to the
-floor. Side view. Orange arrows at the hips point upward. Landscape 16:9,
+Figure at the bottom of a jackknife squat: both hands pressing flat on top
+of a low horizontal bench in front of them, arms straight, upper body
+FOLDED SHARPLY FORWARD — torso nearly parallel to the floor like an open
+jackknife. Hips squatted completely down until hamstrings press against
+calves, heels flat on the floor. The bench is roughly knee height. Side
+view clearly showing the sharp forward fold of the torso and the extreme
+squat depth. Orange arrows at the hips point upward. Landscape 16:9,
 figure centred.
 ```
 
