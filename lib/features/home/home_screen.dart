@@ -13,7 +13,7 @@ import '../../shared/widgets/character_painter.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 import '../../shared/widgets/exercise_progress_card.dart';
 
-const _kAppVersion = 'v1.5.5';
+const _kAppVersion = 'v1.5.6';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -465,6 +465,12 @@ class _UserSwitcherSheetState extends ConsumerState<_UserSwitcherSheet> {
   Widget build(BuildContext context) {
     final profiles = ref.watch(profilesProvider);
     final activeId = ref.watch(activeUserIdProvider);
+    final progression = ref.watch(progressionProvider);
+    final stage = characterStageFor(progression);
+    final currentProfile =
+        profiles.where((p) => p.id == activeId).firstOrNull;
+    final selectedChar =
+        currentProfile?.characterType ?? CharacterType.male;
 
     return Padding(
       padding: EdgeInsets.only(
@@ -572,34 +578,30 @@ class _UserSwitcherSheetState extends ConsumerState<_UserSwitcherSheet> {
                 ],
               ),
             ),
-          // Profile list
+          // Profile list — avatar replaced with character widget
           ...profiles.map((profile) {
             final isActive = profile.id == activeId;
             return ListTile(
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
               leading: Container(
-                width: 40,
-                height: 40,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   color: isActive
-                      ? kPrimary.withValues(alpha: 0.18)
+                      ? kPrimary.withValues(alpha: 0.12)
                       : kBgSurface2,
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(10),
                   border: isActive
                       ? Border.all(color: kPrimary, width: 1.5)
-                      : null,
+                      : Border.all(color: kBorderDefault),
                 ),
                 alignment: Alignment.center,
-                child: Text(
-                  profile.name.isNotEmpty
-                      ? profile.name.isEmpty ? '?' : profile.name[0]
-                      : '?',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: isActive ? kPrimary : kTextSecondary,
-                  ),
+                child: CharacterWidget(
+                  type: profile.characterType,
+                  stage: isActive ? stage : 1,
+                  width: 30,
+                  height: 40,
                 ),
               ),
               title: Text(
@@ -622,7 +624,89 @@ class _UserSwitcherSheetState extends ConsumerState<_UserSwitcherSheet> {
               onTap: isActive ? null : () => _switchTo(profile.id),
             );
           }),
-          const SizedBox(height: 24),
+
+          // ── Character selection ──────────────────────────────────────
+          const Divider(height: 1, indent: 20, endIndent: 20),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '角色設定',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: kTextTertiary,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: CharacterType.values.map((type) {
+                    final isSelected = type == selectedChar;
+                    final isLast = type == CharacterType.values.last;
+                    return Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.only(right: isLast ? 0 : 6),
+                        child: GestureDetector(
+                          onTap: isSelected
+                              ? null
+                              : () async {
+                                  await ref
+                                      .read(profilesProvider.notifier)
+                                      .setCharacterType(activeId, type);
+                                },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 150),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? kPrimary.withValues(alpha: 0.12)
+                                  : kBgSurface2,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: isSelected
+                                    ? kPrimary
+                                    : kBorderDefault,
+                                width: isSelected ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CharacterWidget(
+                                  type: type,
+                                  stage: stage,
+                                  width: 32,
+                                  height: 44,
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  type.nameZh,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: isSelected
+                                        ? FontWeight.w700
+                                        : FontWeight.w500,
+                                    color: isSelected
+                                        ? kPrimary
+                                        : kTextSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

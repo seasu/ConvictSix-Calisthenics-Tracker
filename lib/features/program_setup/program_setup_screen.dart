@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../data/models/character.dart';
 import '../../data/models/exercise.dart';
 import '../../data/models/training_schedule.dart';
 import '../../data/providers/app_providers.dart';
 import '../../features/intro/intro_screen.dart';
 import '../../shared/constants/exercises_data.dart';
 import '../../shared/theme/app_theme.dart';
-import '../../shared/widgets/character_painter.dart';
 import '../../shared/widgets/exercise_detail_sheet.dart';
 
 class ProgramSetupScreen extends ConsumerStatefulWidget {
@@ -26,7 +24,7 @@ class _ProgramSetupScreenState extends ConsumerState<ProgramSetupScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -60,7 +58,6 @@ class _ProgramSetupScreenState extends ConsumerState<ProgramSetupScreen>
           tabs: const [
             Tab(text: '我的程度'),
             Tab(text: '訓練計畫'),
-            Tab(text: '我的角色'),
           ],
         ),
       ),
@@ -69,7 +66,6 @@ class _ProgramSetupScreenState extends ConsumerState<ProgramSetupScreen>
         children: const [
           _ProgressionTab(),
           _ScheduleTab(),
-          _CharacterTab(),
         ],
       ),
     );
@@ -646,134 +642,3 @@ class _ExerciseSelector extends ConsumerWidget {
   }
 }
 
-// ─── Character Tab ────────────────────────────────────────────────────────────
-
-class _CharacterTab extends ConsumerWidget {
-  const _CharacterTab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activeUserId = ref.watch(activeUserIdProvider);
-    final profiles = ref.watch(profilesProvider);
-    final progression = ref.watch(progressionProvider);
-    final currentProfile =
-        profiles.where((p) => p.id == activeUserId).firstOrNull;
-    final selected = currentProfile?.characterType ?? CharacterType.male;
-    final stage = characterStageFor(progression);
-
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        // Current character preview
-        Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.04),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              CharacterWidget(type: selected, stage: stage, width: 90, height: 124),
-              const SizedBox(height: 12),
-              Text(
-                '${selected.nameZh} · Lv.$stage ${stageTitle(stage)}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                stageSubtitle(stage),
-                style: const TextStyle(fontSize: 12, color: Colors.white54),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        const Text(
-          '選擇角色',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Colors.white54,
-            letterSpacing: 0.8,
-          ),
-        ),
-        const SizedBox(height: 12),
-        // Character grid
-        GridView.count(
-          crossAxisCount: 3,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-          childAspectRatio: 0.75,
-          children: CharacterType.values.map((type) {
-            final isSelected = type == selected;
-            return GestureDetector(
-              onTap: () async {
-                if (isSelected) return;
-                await ref
-                    .read(profilesProvider.notifier)
-                    .setCharacterType(activeUserId, type);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? kPrimary.withValues(alpha: 0.12)
-                      : Colors.white.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isSelected
-                        ? kPrimary
-                        : Colors.white.withValues(alpha: 0.12),
-                    width: isSelected ? 1.8 : 1,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CharacterWidget(type: type, stage: stage, width: 60, height: 80),
-                    const SizedBox(height: 8),
-                    Text(
-                      type.nameZh,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
-                        color: isSelected ? kPrimary : Colors.white70,
-                      ),
-                    ),
-                    if (isSelected) ...[
-                      const SizedBox(height: 2),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: kPrimary.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          '使用中',
-                          style: TextStyle(
-                            fontSize: 9,
-                            color: kPrimary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
-}
