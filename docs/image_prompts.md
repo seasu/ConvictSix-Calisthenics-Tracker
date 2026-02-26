@@ -128,18 +128,22 @@ arrows beside the arms curve upward showing the push-up direction. Landscape
 
 ### pushUp_06_sq.jpg — 窄距推 Close Push-up (方形)
 ```
-Figure in push-up position with hands very close together directly under the
-chest (close-grip), elbows pressed tight against the ribcage, chest near the
-floor. Slight 3/4 front-angled view to reveal hand position. Orange arrows
-on elbows flare outward. Square 1:1, figure centred.
+Figure at the bottom of a close-grip push-up: both palms pressed flat
+against the floor with thumbs and index fingers touching, forming a diamond
+shape directly under the chest. Elbows flare out to the sides. Chest nearly
+touching the hands. Slight 3/4 front-angled overhead view so the diamond
+hand formation is clearly visible. Orange arrows on the forearms curve
+upward showing push direction. Square 1:1, figure centred.
 ```
 
 ### pushUp_06_ls.jpg — 窄距推 Close Push-up (橫式)
 ```
-Figure in push-up position with hands very close together directly under the
-chest (close-grip), elbows pressed tight against the ribcage, chest near the
-floor. Slight 3/4 front-angled view to reveal hand position. Orange arrows
-on elbows flare outward. Landscape 16:9, figure centred.
+Figure at the bottom of a close-grip push-up: both palms pressed flat
+against the floor with thumbs and index fingers touching, forming a diamond
+shape directly under the chest. Elbows flare out to the sides. Chest nearly
+touching the hands. Slight 3/4 front-angled overhead view so the diamond
+hand formation is clearly visible. Orange arrows on the forearms curve
+upward showing push direction. Landscape 16:9, figure centred.
 ```
 
 ### pushUp_07_sq.jpg — 偏重推 Uneven Push-up (方形)
