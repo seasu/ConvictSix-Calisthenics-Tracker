@@ -340,18 +340,24 @@ point upward. Landscape 16:9, figure centred.
 
 ### squat_06_sq.jpg — 窄距深蹲 Close Squat (方形)
 ```
-Figure in a complete deep squat with feet touching each other, arms extended
-forward, balancing without any support, extreme knee and ankle flexibility.
-Side view. Orange highlight on the knees and ankles. Square 1:1, figure
-centred.
+Figure at the bottom of a close-stance squat viewed from the FRONT: both
+feet placed TOGETHER touching each other, heels flat on the floor. Both
+arms extended straight FORWARD at shoulder height, palms facing down, for
+balance. Squatted all the way down — hamstrings pressing against calves,
+back upright. Front view clearly showing the feet together side by side,
+both arms reaching straight out forward, and the full squat depth. Orange
+arrows at the knees point outward. Square 1:1, figure centred.
 ```
 
 ### squat_06_ls.jpg — 窄距深蹲 Close Squat (橫式)
 ```
-Figure in a complete deep squat with feet touching each other, arms extended
-forward, balancing without any support, extreme knee and ankle flexibility.
-Side view. Orange highlight on the knees and ankles. Landscape 16:9, figure
-centred.
+Figure at the bottom of a close-stance squat viewed from the FRONT: both
+feet placed TOGETHER touching each other, heels flat on the floor. Both
+arms extended straight FORWARD at shoulder height, palms facing down, for
+balance. Squatted all the way down — hamstrings pressing against calves,
+back upright. Front view clearly showing the feet together side by side,
+both arms reaching straight out forward, and the full squat depth. Orange
+arrows at the knees point outward. Landscape 16:9, figure centred.
 ```
 
 ### squat_07_sq.jpg — 偏重深蹲 Uneven Squat (方形)
