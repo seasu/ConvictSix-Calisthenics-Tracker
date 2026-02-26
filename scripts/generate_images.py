@@ -251,7 +251,7 @@ def generate_gemini(prompt: str, aspect: str) -> bytes:
 # ── Provider: Hugging Face (FLUX.1-schnell) ───────────────────────────────────
 
 HF_MODEL = "black-forest-labs/FLUX.1-schnell"
-HF_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
+HF_URL = f"https://router.huggingface.co/hf-inference/models/{HF_MODEL}"
 
 
 def generate_huggingface(prompt: str, aspect: str) -> bytes:
