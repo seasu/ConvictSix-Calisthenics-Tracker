@@ -1,53 +1,62 @@
 #!/usr/bin/env python3
 """
-Generate exercise illustration images via Gemini Imagen API.
+Generate exercise illustration images via various image-generation APIs.
 
 Reads prompts from docs/image_prompts.md and generates two formats per step:
   - *_sq.jpg  → 1:1  square  (used for thumbnail widgets)
   - *_ls.jpg  → 16:9 landscape (used for the detail-sheet banner)
 
-Usage:
-    export GEMINI_API_KEY=AIza...
+Supported providers
+-------------------
+  gemini        Gemini 2.5 Flash Image (requires GEMINI_API_KEY)
+  huggingface   Hugging Face FLUX.1-schnell  (requires HF_TOKEN — free account)
+  pollinations  Pollinations.AI FLUX (no key required, completely free)
 
-    # Generate all missing images:
+Usage
+-----
+    # Gemini (default)
+    export GEMINI_API_KEY=AIza...
     python3 scripts/generate_images.py
 
-    # Generate all images for one exercise (skip existing):
-    python3 scripts/generate_images.py --exercise squat
+    # Hugging Face
+    export HF_TOKEN=hf_...
+    python3 scripts/generate_images.py --provider huggingface
 
-    # Regenerate specific steps of one exercise (overwrites existing):
-    python3 scripts/generate_images.py --exercise squat --steps 1,6,9 --overwrite
+    # Pollinations (no key needed)
+    python3 scripts/generate_images.py --provider pollinations
 
-    # Regenerate a range of steps across all exercises:
-    python3 scripts/generate_images.py --steps 6-10 --overwrite
-
-    # Overwrite everything:
-    python3 scripts/generate_images.py --overwrite
+    # Regenerate specific steps of one exercise with a specific provider
+    python3 scripts/generate_images.py --provider pollinations \\
+        --exercise squat --steps 1,6,9 --overwrite
 
 Output: assets/images/exercises/{exerciseType}_{step:02d}_{format}.jpg
 """
 
 import argparse
 import base64
+import io
 import os
 import re
 import sys
 import time
+import urllib.parse
 from pathlib import Path
 
 import requests
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-API_KEY = os.environ.get("GEMINI_API_KEY", "")
-IMAGEN_URL = (
-    "https://generativelanguage.googleapis.com/v1beta"
-    "/models/gemini-2.5-flash-image:generateContent"
-)
 OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "images" / "exercises"
 PROMPTS_FILE = Path(__file__).parent.parent / "docs" / "image_prompts.md"
 
 VALID_EXERCISES = ["pushUp", "squat", "pullUp", "legRaise", "bridge", "handstand"]
+VALID_PROVIDERS = ["gemini", "huggingface", "pollinations"]
+
+# Pixel dimensions for each aspect ratio (used by HF and Pollinations)
+ASPECT_SIZES: dict[str, tuple[int, int]] = {
+    "1:1":  (1024, 1024),
+    "16:9": (1344, 768),
+}
 
 GLOBAL_STYLE = (
     "Minimalist calisthenics exercise illustration for a fitness app. "
@@ -62,14 +71,29 @@ GLOBAL_STYLE = (
 )
 
 # Seconds to wait between API calls to avoid rate-limiting
-REQUEST_DELAY = 2
+REQUEST_DELAY_GEMINI       = 2
+REQUEST_DELAY_HUGGINGFACE  = 3
+REQUEST_DELAY_POLLINATIONS = 2
 
 
 # ── Argument parsing ──────────────────────────────────────────────────────────
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate exercise illustration images via Gemini Imagen API."
+        description="Generate exercise illustration images.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--provider",
+        default="gemini",
+        choices=VALID_PROVIDERS,
+        help=(
+            "Image generation provider: "
+            "gemini (GEMINI_API_KEY), "
+            "huggingface (HF_TOKEN, free account), "
+            "pollinations (no key needed). "
+            "Default: gemini"
+        ),
     )
     parser.add_argument(
         "--exercise",
@@ -128,27 +152,18 @@ def parse_prompts(md_path: Path) -> list[dict]:
     Returns a list of dicts:
         {"filename": "pushUp_01_sq.jpg", "prompt": "...", "aspect": "1:1",
          "exercise": "pushUp", "step": 1}
-
-    Parses blocks of the form:
-        ### pushUp_01_sq.jpg — 壁上推 Wall Push-up (方形)
-        ```
-        ...prompt text...
-        ```
-    Filenames ending in _sq.jpg get aspectRatio "1:1".
-    Filenames ending in _ls.jpg get aspectRatio "16:9".
     """
     text = md_path.read_text(encoding="utf-8")
     pattern = re.compile(
         r"###\s+([\w]+\.jpg)[^\n]*\n```\n(.*?)\n```",
         re.DOTALL,
     )
-    # Regex to extract exercise type and step number from filename
     name_re = re.compile(r"^([a-zA-Z]+)_(\d+)_")
 
     entries = []
     for m in pattern.finditer(text):
         filename = m.group(1)
-        prompt = " ".join(m.group(2).split())  # collapse whitespace
+        prompt = " ".join(m.group(2).split())
         aspect = "16:9" if filename.endswith("_ls.jpg") else "1:1"
 
         nm = name_re.match(filename)
@@ -180,10 +195,34 @@ def filter_entries(
     return result
 
 
-# ── Gemini Imagen API call ────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
-def generate_image(prompt: str, aspect: str) -> bytes:
-    """Call Gemini 2.5 Flash Image and return JPEG bytes."""
+def to_jpeg(raw: bytes) -> bytes:
+    """Convert any image bytes to JPEG (no-op if already JPEG)."""
+    # Check JPEG magic bytes
+    if raw[:3] == b"\xff\xd8\xff":
+        return raw
+    from PIL import Image
+    img = Image.open(io.BytesIO(raw)).convert("RGB")
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=90)
+    return buf.getvalue()
+
+
+# ── Provider: Gemini ──────────────────────────────────────────────────────────
+
+GEMINI_URL = (
+    "https://generativelanguage.googleapis.com/v1beta"
+    "/models/gemini-2.5-flash-image:generateContent"
+)
+
+
+def generate_gemini(prompt: str, aspect: str) -> bytes:
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if not api_key:
+        print("ERROR: GEMINI_API_KEY is not set.")
+        sys.exit(1)
+
     full_prompt = GLOBAL_STYLE + prompt
     payload = {
         "contents": [{"parts": [{"text": full_prompt}]}],
@@ -193,42 +232,100 @@ def generate_image(prompt: str, aspect: str) -> bytes:
         },
     }
     resp = requests.post(
-        IMAGEN_URL,
-        params={"key": API_KEY},
+        GEMINI_URL,
+        params={"key": api_key},
         json=payload,
         timeout=120,
     )
     if resp.status_code != 200:
-        raise RuntimeError(
-            f"API error {resp.status_code}: {resp.text[:300]}"
-        )
+        raise RuntimeError(f"API error {resp.status_code}: {resp.text[:300]}")
     data = resp.json()
     parts = data["candidates"][0]["content"]["parts"]
     for part in parts:
         if "inlineData" in part:
             raw = base64.b64decode(part["inlineData"]["data"])
-            mime = part["inlineData"].get("mimeType", "image/png")
-            # Response may be PNG; convert to JPEG so filenames stay *.jpg
-            if mime != "image/jpeg":
-                from PIL import Image
-                import io as _io
-                img = Image.open(_io.BytesIO(raw)).convert("RGB")
-                buf = _io.BytesIO()
-                img.save(buf, format="JPEG", quality=90)
-                return buf.getvalue()
-            return raw
-    raise RuntimeError("No image data in response")
+            return to_jpeg(raw)
+    raise RuntimeError("No image data in Gemini response")
+
+
+# ── Provider: Hugging Face (FLUX.1-schnell) ───────────────────────────────────
+
+HF_MODEL = "black-forest-labs/FLUX.1-schnell"
+HF_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
+
+
+def generate_huggingface(prompt: str, aspect: str) -> bytes:
+    hf_token = os.environ.get("HF_TOKEN", "")
+    if not hf_token:
+        print("ERROR: HF_TOKEN is not set.")
+        print("  Get a free token at https://huggingface.co/settings/tokens")
+        sys.exit(1)
+
+    w, h = ASPECT_SIZES[aspect]
+    full_prompt = GLOBAL_STYLE + prompt
+    payload = {
+        "inputs": full_prompt,
+        "parameters": {
+            "width": w,
+            "height": h,
+            "num_inference_steps": 4,  # FLUX-schnell is optimised for 1–4 steps
+        },
+    }
+    resp = requests.post(
+        HF_URL,
+        headers={"Authorization": f"Bearer {hf_token}"},
+        json=payload,
+        timeout=180,
+    )
+    if resp.status_code == 503:
+        raise RuntimeError("Model is loading — wait a moment then retry.")
+    if resp.status_code != 200:
+        raise RuntimeError(f"API error {resp.status_code}: {resp.text[:300]}")
+    return to_jpeg(resp.content)
+
+
+# ── Provider: Pollinations.AI (free, no key) ──────────────────────────────────
+
+POLLINATIONS_URL = "https://image.pollinations.ai/prompt/{prompt}"
+
+
+def generate_pollinations(prompt: str, aspect: str) -> bytes:
+    w, h = ASPECT_SIZES[aspect]
+    full_prompt = GLOBAL_STYLE + prompt
+    encoded = urllib.parse.quote(full_prompt)
+    url = (
+        f"https://image.pollinations.ai/prompt/{encoded}"
+        f"?width={w}&height={h}&model=flux&nologo=true"
+    )
+    resp = requests.get(url, timeout=120)
+    if resp.status_code != 200:
+        raise RuntimeError(f"API error {resp.status_code}: {resp.text[:200]}")
+    return to_jpeg(resp.content)
+
+
+# ── Dispatch ──────────────────────────────────────────────────────────────────
+
+def generate_image(prompt: str, aspect: str, provider: str) -> bytes:
+    if provider == "gemini":
+        return generate_gemini(prompt, aspect)
+    if provider == "huggingface":
+        return generate_huggingface(prompt, aspect)
+    if provider == "pollinations":
+        return generate_pollinations(prompt, aspect)
+    raise ValueError(f"Unknown provider: {provider}")
+
+
+REQUEST_DELAY = {
+    "gemini": REQUEST_DELAY_GEMINI,
+    "huggingface": REQUEST_DELAY_HUGGINGFACE,
+    "pollinations": REQUEST_DELAY_POLLINATIONS,
+}
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
     args = parse_args()
-
-    if not API_KEY:
-        print("ERROR: GEMINI_API_KEY is not set.")
-        print("  Run:  export GEMINI_API_KEY=AIza...")
-        sys.exit(1)
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -244,14 +341,15 @@ def main() -> None:
         print("No entries match the given --exercise / --steps filter.")
         sys.exit(0)
 
-    # Summary of what will be generated
-    ex_label = args.exercise if args.exercise != "all" else "all exercises"
+    ex_label   = args.exercise if args.exercise != "all" else "all exercises"
     step_label = args.steps if args.steps else "all steps"
+    print(f"Provider : {args.provider}")
     print(f"Exercise : {ex_label}")
     print(f"Steps    : {step_label}")
     print(f"Overwrite: {'yes' if args.overwrite else 'no'}")
     print(f"Matched  : {len(entries)} image(s)\n")
 
+    delay = REQUEST_DELAY[args.provider]
     success = 0
     failed = []
 
@@ -274,7 +372,7 @@ def main() -> None:
             flush=True,
         )
         try:
-            image_bytes = generate_image(entry["prompt"], aspect)
+            image_bytes = generate_image(entry["prompt"], aspect, args.provider)
             out_path.write_bytes(image_bytes)
             print(f"OK ({len(image_bytes) // 1024} KB)")
             success += 1
@@ -283,7 +381,7 @@ def main() -> None:
             failed.append(filename)
 
         if i < len(entries):
-            time.sleep(REQUEST_DELAY)
+            time.sleep(delay)
 
     print(f"\nDone: {success}/{len(entries)} images saved to {OUTPUT_DIR}")
     if failed:
