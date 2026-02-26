@@ -272,18 +272,26 @@ figure centred.
 
 ### squat_03_sq.jpg — 支撐深蹲 Supported Squat (方形)
 ```
-Figure gripping a vertical pole or door frame with both hands, performing a
-full deep squat with thighs below parallel, using the pole to maintain
-balance, back straight. Side view. Orange arrows at the hips show rise
-direction. Square 1:1, figure centred.
+Figure at the bottom of a supported squat: both hands resting flat on the
+TOP surface of a sturdy stool in front of them, arms extended forward and
+angled slightly downward to reach the stool. Stool top is roughly thigh
+height. Back kept upright, NOT leaning forward. Hips squatted all the way
+down with hamstrings pressing against calves, heels flat on the floor. Side
+view clearly showing the upright torso, arms angled forward-down to the
+stool top, and the full depth squat. Orange arrows at the hips point
+upward. Square 1:1, figure centred.
 ```
 
 ### squat_03_ls.jpg — 支撐深蹲 Supported Squat (橫式)
 ```
-Figure gripping a vertical pole or door frame with both hands, performing a
-full deep squat with thighs below parallel, using the pole to maintain
-balance, back straight. Side view. Orange arrows at the hips show rise
-direction. Landscape 16:9, figure centred.
+Figure at the bottom of a supported squat: both hands resting flat on the
+TOP surface of a sturdy stool in front of them, arms extended forward and
+angled slightly downward to reach the stool. Stool top is roughly thigh
+height. Back kept upright, NOT leaning forward. Hips squatted all the way
+down with hamstrings pressing against calves, heels flat on the floor. Side
+view clearly showing the upright torso, arms angled forward-down to the
+stool top, and the full depth squat. Orange arrows at the hips point
+upward. Landscape 16:9, figure centred.
 ```
 
 ### squat_04_sq.jpg — 半程深蹲 Half Squat (方形)
