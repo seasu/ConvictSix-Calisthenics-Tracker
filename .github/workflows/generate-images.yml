@@ -5,17 +5,42 @@ name: Generate Exercise Images
 on:
   workflow_dispatch:
     inputs:
+      exercise:
+        description: 'Exercise to generate (all = every exercise)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - pushUp
+          - squat
+          - pullUp
+          - legRaise
+          - bridge
+          - handstand
+      steps:
+        description: 'Step numbers (e.g. "1,6,9" or "6-10" or "1-3,8" — blank = all steps)'
+        required: false
+        default: ''
+        type: string
       overwrite:
-        description: 'Overwrite existing images (yes / no)'
+        description: 'Overwrite existing images for the selected exercise/steps'
         required: false
         default: 'no'
+        type: choice
+        options:
+          - 'no'
+          - 'yes'
 
 permissions:
   contents: write   # needed to push generated images back to the repo
 
 jobs:
   generate:
-    name: Generate via Gemini Imagen 3
+    name: >-
+      Generate
+      ${{ github.event.inputs.exercise == 'all' && 'all exercises' || github.event.inputs.exercise }}
+      ${{ github.event.inputs.steps != '' && format('steps {0}', github.event.inputs.steps) || '(all steps)' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -30,16 +55,14 @@ jobs:
       - name: Install dependencies
         run: pip install requests pillow
 
-      - name: Wipe existing images (if overwrite requested)
-        if: ${{ github.event.inputs.overwrite == 'yes' }}
-        run: |
-          find assets/images/exercises -name '*.jpg' -delete
-          echo "Existing images removed."
-
       - name: Generate images
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python3 scripts/generate_images.py
+        run: |
+          python3 scripts/generate_images.py \
+            --exercise "${{ github.event.inputs.exercise }}" \
+            --steps    "${{ github.event.inputs.steps }}" \
+            ${{ github.event.inputs.overwrite == 'yes' && '--overwrite' || '' }}
 
       - name: Commit and push generated images
         run: |
@@ -50,6 +73,11 @@ jobs:
             echo "No new images to commit."
           else
             COUNT=$(git diff --cached --name-only | wc -l)
-            git commit -m "Generate ${COUNT} exercise images via Gemini Imagen 3"
+            EXERCISE="${{ github.event.inputs.exercise }}"
+            STEPS="${{ github.event.inputs.steps }}"
+            MSG="Generate ${COUNT} images"
+            [ "$EXERCISE" != "all" ] && MSG="${MSG} [${EXERCISE}]"
+            [ -n "$STEPS" ] && MSG="${MSG} steps ${STEPS}"
+            git commit -m "${MSG} via Gemini Imagen"
             git push
           fi
