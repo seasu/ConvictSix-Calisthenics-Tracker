@@ -412,34 +412,56 @@ figure centred.
 
 ### squat_09_sq.jpg — 輔助單腿深蹲 Assisted One-Leg Squat (方形)
 ```
-Figure performing a full single-leg squat (pistol squat) with one leg
-extended forward, one hand lightly touching a wall or vertical pole for
-minimal balance support, at the bottom position. Side view. Orange arrows at
-the standing hip curve upward. Square 1:1, figure centred.
+Figure at the bottom of a Bulgarian-style single-leg squat, side view: one
+foot (working leg) planted flat on the floor in front, knee deeply bent.
+The other leg extends BEHIND the body with the heel resting on top of a
+basketball sitting on the floor behind them. Torso leans FAR FORWARD,
+nearly parallel to the floor. Both arms hang DOWN in front of the body
+toward the floor. No wall, no pole — the basketball under the back heel is
+the only prop. Side view clearly showing the front working foot, the back
+heel on the ball, the deeply forward-leaning torso, and arms hanging down.
+Orange accent on the working knee. Square 1:1, figure centred.
 ```
 
 ### squat_09_ls.jpg — 輔助單腿深蹲 Assisted One-Leg Squat (橫式)
 ```
-Figure performing a full single-leg squat (pistol squat) with one leg
-extended forward, one hand lightly touching a wall or vertical pole for
-minimal balance support, at the bottom position. Side view. Orange arrows at
-the standing hip curve upward. Landscape 16:9, figure centred.
+Figure at the bottom of a Bulgarian-style single-leg squat, side view: one
+foot (working leg) planted flat on the floor in front, knee deeply bent.
+The other leg extends BEHIND the body with the heel resting on top of a
+basketball sitting on the floor behind them. Torso leans FAR FORWARD,
+nearly parallel to the floor. Both arms hang DOWN in front of the body
+toward the floor. No wall, no pole — the basketball under the back heel is
+the only prop. Side view clearly showing the front working foot, the back
+heel on the ball, the deeply forward-leaning torso, and arms hanging down.
+Orange accent on the working knee. Landscape 16:9, figure centred.
 ```
 
 ### squat_10_sq.jpg — 單腿深蹲 One-Leg Squat Pistol (方形)
 ```
-Complete unsupported pistol squat: one leg fully extended forward at
-horizontal, the other leg bent deeply, arms stretched forward as counter-
-balance, no support, at the lowest point. Side view. Orange highlight on the
-bent knee and hip. Square 1:1, figure centred.
+Figure at the absolute bottom of a full single-leg squat, side view: one
+foot planted on the floor (working leg), knee completely bent — squatted
+all the way down to the lowest possible point. The other leg extends
+BEHIND and is lifted off the floor, knee bent, foot raised. Torso leans
+EXTREMELY FAR FORWARD — nearly horizontal, head pointing down toward the
+floor. Both arms hang completely DOWN in front of the body, fingertips
+toward the floor. No props, no support. Side view clearly showing the
+single deeply bent working knee, the free leg lifted behind, the nearly
+horizontal torso, and arms hanging straight down. Orange glow on the
+working knee and hip. Square 1:1, figure centred.
 ```
 
 ### squat_10_ls.jpg — 單腿深蹲 One-Leg Squat Pistol (橫式)
 ```
-Complete unsupported pistol squat: one leg fully extended forward at
-horizontal, the other leg bent deeply, arms stretched forward as counter-
-balance, no support, at the lowest point. Side view. Orange highlight on the
-bent knee and hip. Landscape 16:9, figure centred.
+Figure at the absolute bottom of a full single-leg squat, side view: one
+foot planted on the floor (working leg), knee completely bent — squatted
+all the way down to the lowest possible point. The other leg extends
+BEHIND and is lifted off the floor, knee bent, foot raised. Torso leans
+EXTREMELY FAR FORWARD — nearly horizontal, head pointing down toward the
+floor. Both arms hang completely DOWN in front of the body, fingertips
+toward the floor. No props, no support. Side view clearly showing the
+single deeply bent working knee, the free leg lifted behind, the nearly
+horizontal torso, and arms hanging straight down. Orange glow on the
+working knee and hip. Landscape 16:9, figure centred.
 ```
 
 ---
