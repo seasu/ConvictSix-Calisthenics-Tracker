@@ -386,18 +386,28 @@ glow on the working knee. Landscape 16:9, figure centred.
 
 ### squat_08_sq.jpg — 半單腿深蹲 Half One-Leg Squat (方形)
 ```
-Figure balancing on one leg, the other leg extended straight forward and off
-the ground, squatting down until the standing knee bends to 90 degrees
-(halfway), arms forward for balance. Side view. Orange arc arrow at the
-standing knee. Square 1:1, figure centred.
+Figure at the bottom of a half one-leg squat, side view: standing on one
+foot (working leg), knee bent to roughly 90 degrees. The other leg extends
+STRAIGHT BACK behind the body, lifted off the floor. Torso leans SHARPLY
+FORWARD as a counterbalance, nearly parallel to the floor. Both arms hang
+DOWN in front of the body toward the floor — NOT extended forward at
+shoulder height. Side view clearly showing the single planted foot, the
+back leg extending behind, the sharply forward-leaning torso, and the arms
+hanging downward. Orange accent on the bent working knee. Square 1:1,
+figure centred.
 ```
 
 ### squat_08_ls.jpg — 半單腿深蹲 Half One-Leg Squat (橫式)
 ```
-Figure balancing on one leg, the other leg extended straight forward and off
-the ground, squatting down until the standing knee bends to 90 degrees
-(halfway), arms forward for balance. Side view. Orange arc arrow at the
-standing knee. Landscape 16:9, figure centred.
+Figure at the bottom of a half one-leg squat, side view: standing on one
+foot (working leg), knee bent to roughly 90 degrees. The other leg extends
+STRAIGHT BACK behind the body, lifted off the floor. Torso leans SHARPLY
+FORWARD as a counterbalance, nearly parallel to the floor. Both arms hang
+DOWN in front of the body toward the floor — NOT extended forward at
+shoulder height. Side view clearly showing the single planted foot, the
+back leg extending behind, the sharply forward-leaning torso, and the arms
+hanging downward. Orange accent on the bent working knee. Landscape 16:9,
+figure centred.
 ```
 
 ### squat_09_sq.jpg — 輔助單腿深蹲 Assisted One-Leg Squat (方形)
