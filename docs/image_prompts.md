@@ -128,18 +128,22 @@ arrows beside the arms curve upward showing the push-up direction. Landscape
 
 ### pushUp_06_sq.jpg — 窄距推 Close Push-up (方形)
 ```
-Figure in push-up position with hands very close together directly under the
-chest (close-grip), elbows pressed tight against the ribcage, chest near the
-floor. Slight 3/4 front-angled view to reveal hand position. Orange arrows
-on elbows flare outward. Square 1:1, figure centred.
+Figure at the bottom of a close-grip push-up: both palms pressed flat
+against the floor with thumbs and index fingers touching, forming a diamond
+shape directly under the chest. Elbows flare out to the sides. Chest nearly
+touching the hands. Slight 3/4 front-angled overhead view so the diamond
+hand formation is clearly visible. Orange arrows on the forearms curve
+upward showing push direction. Square 1:1, figure centred.
 ```
 
 ### pushUp_06_ls.jpg — 窄距推 Close Push-up (橫式)
 ```
-Figure in push-up position with hands very close together directly under the
-chest (close-grip), elbows pressed tight against the ribcage, chest near the
-floor. Slight 3/4 front-angled view to reveal hand position. Orange arrows
-on elbows flare outward. Landscape 16:9, figure centred.
+Figure at the bottom of a close-grip push-up: both palms pressed flat
+against the floor with thumbs and index fingers touching, forming a diamond
+shape directly under the chest. Elbows flare out to the sides. Chest nearly
+touching the hands. Slight 3/4 front-angled overhead view so the diamond
+hand formation is clearly visible. Orange arrows on the forearms curve
+upward showing push direction. Landscape 16:9, figure centred.
 ```
 
 ### pushUp_07_sq.jpg — 偏重推 Uneven Push-up (方形)
@@ -176,18 +180,28 @@ downward. Landscape 16:9, figure centred.
 
 ### pushUp_09_sq.jpg — 槓桿推 Lever Push-up (方形)
 ```
-Figure with one hand planted directly under the chest and the other arm
-fully extended sideways resting on a round ball, performing a deep
-one-sided push-up, body at an extreme lateral tilt. Front-angled view.
-Orange accent on the working shoulder. Square 1:1, figure centred.
+Figure performing a lever push-up at the bottom position, chest barely one
+fist above the floor. The working arm is BENT at the elbow, hand flat on
+the floor directly under that shoulder, fingers spread wide, bearing full
+body weight. The other arm is COMPLETELY HORIZONTAL, extended straight out
+to the side at shoulder height, palm resting on top of a basketball sitting
+on the floor. Body is rigid and nearly parallel to the floor. Low 3/4 front
+angle view showing both arms clearly — the bent arm under the chest and the
+fully extended arm reaching sideways onto the ball. Orange glow on the bent
+working arm and shoulder. Square 1:1, figure centred.
 ```
 
 ### pushUp_09_ls.jpg — 槓桿推 Lever Push-up (橫式)
 ```
-Figure with one hand planted directly under the chest and the other arm
-fully extended sideways resting on a round ball, performing a deep
-one-sided push-up, body at an extreme lateral tilt. Front-angled view.
-Orange accent on the working shoulder. Landscape 16:9, figure centred.
+Figure performing a lever push-up at the bottom position, chest barely one
+fist above the floor. The working arm is BENT at the elbow, hand flat on
+the floor directly under that shoulder, fingers spread wide, bearing full
+body weight. The other arm is COMPLETELY HORIZONTAL, extended straight out
+to the side at shoulder height, palm resting on top of a basketball sitting
+on the floor. Body is rigid and nearly parallel to the floor. Low 3/4 front
+angle view showing both arms clearly — the bent arm under the chest and the
+fully extended arm reaching sideways onto the ball. Orange glow on the bent
+working arm and shoulder. Landscape 16:9, figure centred.
 ```
 
 ### pushUp_10_sq.jpg — 單手推 One-Arm Push-up (方形)
@@ -212,162 +226,242 @@ Side view. Orange arc arrow beside the single arm curves upward. Landscape
 
 ### squat_01_sq.jpg — 肩撐深蹲 Shoulderstand Squat (方形)
 ```
-Figure lying on their back, upper body flat on the floor, legs raised
-vertically and supported on shoulders and upper back, both knees bent and
-cycling in a pedaling motion in the air. Side view. Orange arrows on the
-legs show the up-down cycling motion. Square 1:1, figure centred.
+Figure lying on their back in a shoulder stand: upper arms pressed flat on
+the floor, both hands placed under the lower back supporting the hips, which
+are lifted off the floor. BOTH LEGS extend straight up perfectly vertical,
+perpendicular to the ground, toes pointing at the ceiling. Body forms an
+inverted-L shape. Side view clearly showing the flat upper arms, hands under
+the lower back, elevated hips, and the two legs pointing straight up. Orange
+arrows on the legs point upward. Square 1:1, figure centred.
 ```
 
 ### squat_01_ls.jpg — 肩撐深蹲 Shoulderstand Squat (橫式)
 ```
-Figure lying on their back, upper body flat on the floor, legs raised
-vertically and supported on shoulders and upper back, both knees bent and
-cycling in a pedaling motion in the air. Side view. Orange arrows on the
-legs show the up-down cycling motion. Landscape 16:9, figure centred.
+Figure lying on their back in a shoulder stand: upper arms pressed flat on
+the floor, both hands placed under the lower back supporting the hips, which
+are lifted off the floor. BOTH LEGS extend straight up perfectly vertical,
+perpendicular to the ground, toes pointing at the ceiling. Body forms an
+inverted-L shape. Side view clearly showing the flat upper arms, hands under
+the lower back, elevated hips, and the two legs pointing straight up. Orange
+arrows on the legs point upward. Landscape 16:9, figure centred.
 ```
 
 ### squat_02_sq.jpg — 摺刀深蹲 Jackknife Squat (方形)
 ```
-Figure in a full deep squat with both hands lightly resting on the back of a
-chair placed in front of them, back straight, thighs below parallel to the
-floor. Side view. Orange arrows at the hips point upward. Square 1:1,
-figure centred.
+Figure at the bottom of a jackknife squat: both hands pressing flat on top
+of a low horizontal bench in front of them, arms straight, upper body
+FOLDED SHARPLY FORWARD — torso nearly parallel to the floor like an open
+jackknife. Hips squatted completely down until hamstrings press against
+calves, heels flat on the floor. The bench is roughly knee height. Side
+view clearly showing the sharp forward fold of the torso and the extreme
+squat depth. Orange arrows at the hips point upward. Square 1:1, figure
+centred.
 ```
 
 ### squat_02_ls.jpg — 摺刀深蹲 Jackknife Squat (橫式)
 ```
-Figure in a full deep squat with both hands lightly resting on the back of a
-chair placed in front of them, back straight, thighs below parallel to the
-floor. Side view. Orange arrows at the hips point upward. Landscape 16:9,
+Figure at the bottom of a jackknife squat: both hands pressing flat on top
+of a low horizontal bench in front of them, arms straight, upper body
+FOLDED SHARPLY FORWARD — torso nearly parallel to the floor like an open
+jackknife. Hips squatted completely down until hamstrings press against
+calves, heels flat on the floor. The bench is roughly knee height. Side
+view clearly showing the sharp forward fold of the torso and the extreme
+squat depth. Orange arrows at the hips point upward. Landscape 16:9,
 figure centred.
 ```
 
 ### squat_03_sq.jpg — 支撐深蹲 Supported Squat (方形)
 ```
-Figure gripping a vertical pole or door frame with both hands, performing a
-full deep squat with thighs below parallel, using the pole to maintain
-balance, back straight. Side view. Orange arrows at the hips show rise
-direction. Square 1:1, figure centred.
+Figure at the bottom of a supported squat: both hands resting flat on the
+TOP surface of a sturdy stool in front of them, arms extended forward and
+angled slightly downward to reach the stool. Stool top is roughly thigh
+height. Back kept upright, NOT leaning forward. Hips squatted all the way
+down with hamstrings pressing against calves, heels flat on the floor. Side
+view clearly showing the upright torso, arms angled forward-down to the
+stool top, and the full depth squat. Orange arrows at the hips point
+upward. Square 1:1, figure centred.
 ```
 
 ### squat_03_ls.jpg — 支撐深蹲 Supported Squat (橫式)
 ```
-Figure gripping a vertical pole or door frame with both hands, performing a
-full deep squat with thighs below parallel, using the pole to maintain
-balance, back straight. Side view. Orange arrows at the hips show rise
-direction. Landscape 16:9, figure centred.
+Figure at the bottom of a supported squat: both hands resting flat on the
+TOP surface of a sturdy stool in front of them, arms extended forward and
+angled slightly downward to reach the stool. Stool top is roughly thigh
+height. Back kept upright, NOT leaning forward. Hips squatted all the way
+down with hamstrings pressing against calves, heels flat on the floor. Side
+view clearly showing the upright torso, arms angled forward-down to the
+stool top, and the full depth squat. Orange arrows at the hips point
+upward. Landscape 16:9, figure centred.
 ```
 
 ### squat_04_sq.jpg — 半程深蹲 Half Squat (方形)
 ```
-Figure in a squat with feet shoulder-width apart, thighs at a 45-degree
-angle (halfway down), arms extended forward at shoulder height for balance.
-Side view. Orange arc arrow at the knees shows partial bend. Square 1:1,
-figure centred.
+Figure in a half squat viewed from the FRONT: feet shoulder-width apart,
+toes turned slightly outward. Arms CROSSED over the chest (not extended
+forward). Knees bent to approximately 90 degrees so thighs are roughly
+parallel to the floor — halfway between standing and a full squat. Back
+upright. Front view clearly showing the crossed arms, outward-angled toes,
+and the 90-degree knee bend. Orange arc arrows at the knees show the bend
+direction. Square 1:1, figure centred.
 ```
 
 ### squat_04_ls.jpg — 半程深蹲 Half Squat (橫式)
 ```
-Figure in a squat with feet shoulder-width apart, thighs at a 45-degree
-angle (halfway down), arms extended forward at shoulder height for balance.
-Side view. Orange arc arrow at the knees shows partial bend. Landscape 16:9,
-figure centred.
+Figure in a half squat viewed from the FRONT: feet shoulder-width apart,
+toes turned slightly outward. Arms CROSSED over the chest (not extended
+forward). Knees bent to approximately 90 degrees so thighs are roughly
+parallel to the floor — halfway between standing and a full squat. Back
+upright. Front view clearly showing the crossed arms, outward-angled toes,
+and the 90-degree knee bend. Orange arc arrows at the knees show the bend
+direction. Landscape 16:9, figure centred.
 ```
 
 ### squat_05_sq.jpg — 標準深蹲 Full Squat (方形)
 ```
-Figure in a full deep squat with thighs at or below parallel, back straight,
-arms extended forward, feet shoulder-width apart with toes angled slightly
-out. Side view. Orange arrows at the hips curve upward. Square 1:1,
-figure centred.
+Figure at the bottom of a full squat viewed from the FRONT: feet
+shoulder-width apart, toes turned slightly outward, heels flat on the floor.
+Arms CROSSED over the chest (not extended forward). Squatted all the way
+down — hamstrings pressing against calves, hips below the knees, back as
+upright as possible. Front view clearly showing the crossed arms,
+outward-angled toes, and the full squat depth. Orange arrows at the hips
+point upward. Square 1:1, figure centred.
 ```
 
 ### squat_05_ls.jpg — 標準深蹲 Full Squat (橫式)
 ```
-Figure in a full deep squat with thighs at or below parallel, back straight,
-arms extended forward, feet shoulder-width apart with toes angled slightly
-out. Side view. Orange arrows at the hips curve upward. Landscape 16:9,
-figure centred.
+Figure at the bottom of a full squat viewed from the FRONT: feet
+shoulder-width apart, toes turned slightly outward, heels flat on the floor.
+Arms CROSSED over the chest (not extended forward). Squatted all the way
+down — hamstrings pressing against calves, hips below the knees, back as
+upright as possible. Front view clearly showing the crossed arms,
+outward-angled toes, and the full squat depth. Orange arrows at the hips
+point upward. Landscape 16:9, figure centred.
 ```
 
 ### squat_06_sq.jpg — 窄距深蹲 Close Squat (方形)
 ```
-Figure in a complete deep squat with feet touching each other, arms extended
-forward, balancing without any support, extreme knee and ankle flexibility.
-Side view. Orange highlight on the knees and ankles. Square 1:1, figure
-centred.
+Figure at the bottom of a close-stance squat viewed from the FRONT: both
+feet placed TOGETHER touching each other, heels flat on the floor. Both
+arms extended straight FORWARD at shoulder height, palms facing down, for
+balance. Squatted all the way down — hamstrings pressing against calves,
+back upright. Front view clearly showing the feet together side by side,
+both arms reaching straight out forward, and the full squat depth. Orange
+arrows at the knees point outward. Square 1:1, figure centred.
 ```
 
 ### squat_06_ls.jpg — 窄距深蹲 Close Squat (橫式)
 ```
-Figure in a complete deep squat with feet touching each other, arms extended
-forward, balancing without any support, extreme knee and ankle flexibility.
-Side view. Orange highlight on the knees and ankles. Landscape 16:9, figure
-centred.
+Figure at the bottom of a close-stance squat viewed from the FRONT: both
+feet placed TOGETHER touching each other, heels flat on the floor. Both
+arms extended straight FORWARD at shoulder height, palms facing down, for
+balance. Squatted all the way down — hamstrings pressing against calves,
+back upright. Front view clearly showing the feet together side by side,
+both arms reaching straight out forward, and the full squat depth. Orange
+arrows at the knees point outward. Landscape 16:9, figure centred.
 ```
 
 ### squat_07_sq.jpg — 偏重深蹲 Uneven Squat (方形)
 ```
-Figure squatting with one foot planted flat on the floor and the other foot
-raised on a round ball to the side, weight distributed unevenly, at the
-bottom of an asymmetric squat. 3/4 view. Orange highlight on the loaded
-knee. Square 1:1, figure centred.
+Figure at the bottom of an uneven squat, side view: one foot planted flat
+on the floor (the working leg), knee deeply bent and close to the floor.
+The other foot rests on top of a basketball sitting on the floor to that
+side, that leg fairly straight. Arms hang NATURALLY at the sides — not
+reaching forward or touching the ball. Torso leans slightly forward from
+the deep squat. Side view clearly showing the deeply bent working knee, the
+elevated foot on the ball, and the naturally hanging arms. Orange accent
+glow on the working knee. Square 1:1, figure centred.
 ```
 
 ### squat_07_ls.jpg — 偏重深蹲 Uneven Squat (橫式)
 ```
-Figure squatting with one foot planted flat on the floor and the other foot
-raised on a round ball to the side, weight distributed unevenly, at the
-bottom of an asymmetric squat. 3/4 view. Orange highlight on the loaded
-knee. Landscape 16:9, figure centred.
+Figure at the bottom of an uneven squat, side view: one foot planted flat
+on the floor (the working leg), knee deeply bent and close to the floor.
+The other foot rests on top of a basketball sitting on the floor to that
+side, that leg fairly straight. Arms hang NATURALLY at the sides — not
+reaching forward or touching the ball. Torso leans slightly forward from
+the deep squat. Side view clearly showing the deeply bent working knee, the
+elevated foot on the ball, and the naturally hanging arms. Orange accent
+glow on the working knee. Landscape 16:9, figure centred.
 ```
 
 ### squat_08_sq.jpg — 半單腿深蹲 Half One-Leg Squat (方形)
 ```
-Figure balancing on one leg, the other leg extended straight forward and off
-the ground, squatting down until the standing knee bends to 90 degrees
-(halfway), arms forward for balance. Side view. Orange arc arrow at the
-standing knee. Square 1:1, figure centred.
+Figure at the bottom of a half one-leg squat, side view: standing on one
+foot (working leg), knee bent to roughly 90 degrees. The other leg extends
+STRAIGHT BACK behind the body, lifted off the floor. Torso leans SHARPLY
+FORWARD as a counterbalance, nearly parallel to the floor. Both arms hang
+DOWN in front of the body toward the floor — NOT extended forward at
+shoulder height. Side view clearly showing the single planted foot, the
+back leg extending behind, the sharply forward-leaning torso, and the arms
+hanging downward. Orange accent on the bent working knee. Square 1:1,
+figure centred.
 ```
 
 ### squat_08_ls.jpg — 半單腿深蹲 Half One-Leg Squat (橫式)
 ```
-Figure balancing on one leg, the other leg extended straight forward and off
-the ground, squatting down until the standing knee bends to 90 degrees
-(halfway), arms forward for balance. Side view. Orange arc arrow at the
-standing knee. Landscape 16:9, figure centred.
+Figure at the bottom of a half one-leg squat, side view: standing on one
+foot (working leg), knee bent to roughly 90 degrees. The other leg extends
+STRAIGHT BACK behind the body, lifted off the floor. Torso leans SHARPLY
+FORWARD as a counterbalance, nearly parallel to the floor. Both arms hang
+DOWN in front of the body toward the floor — NOT extended forward at
+shoulder height. Side view clearly showing the single planted foot, the
+back leg extending behind, the sharply forward-leaning torso, and the arms
+hanging downward. Orange accent on the bent working knee. Landscape 16:9,
+figure centred.
 ```
 
 ### squat_09_sq.jpg — 輔助單腿深蹲 Assisted One-Leg Squat (方形)
 ```
-Figure performing a full single-leg squat (pistol squat) with one leg
-extended forward, one hand lightly touching a wall or vertical pole for
-minimal balance support, at the bottom position. Side view. Orange arrows at
-the standing hip curve upward. Square 1:1, figure centred.
+Figure at the bottom of a Bulgarian-style single-leg squat, side view: one
+foot (working leg) planted flat on the floor in front, knee deeply bent.
+The other leg extends BEHIND the body with the heel resting on top of a
+basketball sitting on the floor behind them. Torso leans FAR FORWARD,
+nearly parallel to the floor. Both arms hang DOWN in front of the body
+toward the floor. No wall, no pole — the basketball under the back heel is
+the only prop. Side view clearly showing the front working foot, the back
+heel on the ball, the deeply forward-leaning torso, and arms hanging down.
+Orange accent on the working knee. Square 1:1, figure centred.
 ```
 
 ### squat_09_ls.jpg — 輔助單腿深蹲 Assisted One-Leg Squat (橫式)
 ```
-Figure performing a full single-leg squat (pistol squat) with one leg
-extended forward, one hand lightly touching a wall or vertical pole for
-minimal balance support, at the bottom position. Side view. Orange arrows at
-the standing hip curve upward. Landscape 16:9, figure centred.
+Figure at the bottom of a Bulgarian-style single-leg squat, side view: one
+foot (working leg) planted flat on the floor in front, knee deeply bent.
+The other leg extends BEHIND the body with the heel resting on top of a
+basketball sitting on the floor behind them. Torso leans FAR FORWARD,
+nearly parallel to the floor. Both arms hang DOWN in front of the body
+toward the floor. No wall, no pole — the basketball under the back heel is
+the only prop. Side view clearly showing the front working foot, the back
+heel on the ball, the deeply forward-leaning torso, and arms hanging down.
+Orange accent on the working knee. Landscape 16:9, figure centred.
 ```
 
 ### squat_10_sq.jpg — 單腿深蹲 One-Leg Squat Pistol (方形)
 ```
-Complete unsupported pistol squat: one leg fully extended forward at
-horizontal, the other leg bent deeply, arms stretched forward as counter-
-balance, no support, at the lowest point. Side view. Orange highlight on the
-bent knee and hip. Square 1:1, figure centred.
+Figure at the absolute bottom of a full single-leg squat, side view: one
+foot planted on the floor (working leg), knee completely bent — squatted
+all the way down to the lowest possible point. The other leg extends
+BEHIND and is lifted off the floor, knee bent, foot raised. Torso leans
+EXTREMELY FAR FORWARD — nearly horizontal, head pointing down toward the
+floor. Both arms hang completely DOWN in front of the body, fingertips
+toward the floor. No props, no support. Side view clearly showing the
+single deeply bent working knee, the free leg lifted behind, the nearly
+horizontal torso, and arms hanging straight down. Orange glow on the
+working knee and hip. Square 1:1, figure centred.
 ```
 
 ### squat_10_ls.jpg — 單腿深蹲 One-Leg Squat Pistol (橫式)
 ```
-Complete unsupported pistol squat: one leg fully extended forward at
-horizontal, the other leg bent deeply, arms stretched forward as counter-
-balance, no support, at the lowest point. Side view. Orange highlight on the
-bent knee and hip. Landscape 16:9, figure centred.
+Figure at the absolute bottom of a full single-leg squat, side view: one
+foot planted on the floor (working leg), knee completely bent — squatted
+all the way down to the lowest possible point. The other leg extends
+BEHIND and is lifted off the floor, knee bent, foot raised. Torso leans
+EXTREMELY FAR FORWARD — nearly horizontal, head pointing down toward the
+floor. Both arms hang completely DOWN in front of the body, fingertips
+toward the floor. No props, no support. Side view clearly showing the
+single deeply bent working knee, the free leg lifted behind, the nearly
+horizontal torso, and arms hanging straight down. Orange glow on the
+working knee and hip. Landscape 16:9, figure centred.
 ```
 
 ---

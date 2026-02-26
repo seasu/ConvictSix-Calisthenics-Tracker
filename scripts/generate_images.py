@@ -8,11 +8,26 @@ Reads prompts from docs/image_prompts.md and generates two formats per step:
 
 Usage:
     export GEMINI_API_KEY=AIza...
+
+    # Generate all missing images:
     python3 scripts/generate_images.py
+
+    # Generate all images for one exercise (skip existing):
+    python3 scripts/generate_images.py --exercise squat
+
+    # Regenerate specific steps of one exercise (overwrites existing):
+    python3 scripts/generate_images.py --exercise squat --steps 1,6,9 --overwrite
+
+    # Regenerate a range of steps across all exercises:
+    python3 scripts/generate_images.py --steps 6-10 --overwrite
+
+    # Overwrite everything:
+    python3 scripts/generate_images.py --overwrite
 
 Output: assets/images/exercises/{exerciseType}_{step:02d}_{format}.jpg
 """
 
+import argparse
 import base64
 import os
 import re
@@ -32,6 +47,8 @@ IMAGEN_URL = (
 OUTPUT_DIR = Path(__file__).parent.parent / "assets" / "images" / "exercises"
 PROMPTS_FILE = Path(__file__).parent.parent / "docs" / "image_prompts.md"
 
+VALID_EXERCISES = ["pushUp", "squat", "pullUp", "legRaise", "bridge", "handstand"]
+
 GLOBAL_STYLE = (
     "Minimalist calisthenics exercise illustration for a fitness app. "
     "Smooth, slightly volumetric white figure with subtle grey shading on a "
@@ -48,11 +65,69 @@ GLOBAL_STYLE = (
 REQUEST_DELAY = 2
 
 
+# ── Argument parsing ──────────────────────────────────────────────────────────
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Generate exercise illustration images via Gemini Imagen API."
+    )
+    parser.add_argument(
+        "--exercise",
+        default="all",
+        choices=["all"] + VALID_EXERCISES,
+        help="Which exercise to generate (default: all)",
+    )
+    parser.add_argument(
+        "--steps",
+        default="",
+        metavar="STEPS",
+        help=(
+            "Step numbers to generate, e.g. '1,6,9' or '6-10' or '1-3,8'. "
+            "Leave blank to generate all steps."
+        ),
+    )
+    parser.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="Overwrite images that already exist on disk.",
+    )
+    return parser.parse_args()
+
+
+def parse_steps(steps_str: str) -> set[int] | None:
+    """
+    Parse a steps string into a set of ints.
+    Returns None when the string is blank (meaning: all steps).
+
+    Supported formats:
+      ''          → all steps (returns None)
+      '6'         → {6}
+      '1,6,9'     → {1, 6, 9}
+      '6-10'      → {6, 7, 8, 9, 10}
+      '1-3,8,10'  → {1, 2, 3, 8, 10}
+    """
+    if not steps_str.strip():
+        return None
+    result: set[int] = set()
+    for part in steps_str.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            a, b = part.split("-", 1)
+            result.update(range(int(a.strip()), int(b.strip()) + 1))
+        else:
+            result.add(int(part))
+    return result
+
+
 # ── Parse prompts from markdown ───────────────────────────────────────────────
 
 def parse_prompts(md_path: Path) -> list[dict]:
     """
-    Returns a list of dicts: {"filename": "pushUp_01_sq.jpg", "prompt": "..."}.
+    Returns a list of dicts:
+        {"filename": "pushUp_01_sq.jpg", "prompt": "...", "aspect": "1:1",
+         "exercise": "pushUp", "step": 1}
 
     Parses blocks of the form:
         ### pushUp_01_sq.jpg — 壁上推 Wall Push-up (方形)
@@ -63,25 +138,46 @@ def parse_prompts(md_path: Path) -> list[dict]:
     Filenames ending in _ls.jpg get aspectRatio "16:9".
     """
     text = md_path.read_text(encoding="utf-8")
-    # Match  ### filename.jpg — ... \n ``` \n <prompt> \n ```
     pattern = re.compile(
         r"###\s+([\w]+\.jpg)[^\n]*\n```\n(.*?)\n```",
         re.DOTALL,
     )
+    # Regex to extract exercise type and step number from filename
+    name_re = re.compile(r"^([a-zA-Z]+)_(\d+)_")
+
     entries = []
     for m in pattern.finditer(text):
         filename = m.group(1)
         prompt = " ".join(m.group(2).split())  # collapse whitespace
-        if filename.endswith("_ls.jpg"):
-            aspect = "16:9"
-        else:
-            aspect = "1:1"
+        aspect = "16:9" if filename.endswith("_ls.jpg") else "1:1"
+
+        nm = name_re.match(filename)
+        exercise = nm.group(1) if nm else ""
+        step = int(nm.group(2)) if nm else 0
+
         entries.append({
             "filename": filename,
             "prompt": prompt,
             "aspect": aspect,
+            "exercise": exercise,
+            "step": step,
         })
     return entries
+
+
+def filter_entries(
+    entries: list[dict],
+    exercise_filter: str,
+    step_filter: set[int] | None,
+) -> list[dict]:
+    result = []
+    for entry in entries:
+        if exercise_filter != "all" and entry["exercise"] != exercise_filter:
+            continue
+        if step_filter is not None and entry["step"] not in step_filter:
+            continue
+        result.append(entry)
+    return result
 
 
 # ── Gemini Imagen API call ────────────────────────────────────────────────────
@@ -127,6 +223,8 @@ def generate_image(prompt: str, aspect: str) -> bytes:
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> None:
+    args = parse_args()
+
     if not API_KEY:
         print("ERROR: GEMINI_API_KEY is not set.")
         print("  Run:  export GEMINI_API_KEY=AIza...")
@@ -134,12 +232,25 @@ def main() -> None:
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    entries = parse_prompts(PROMPTS_FILE)
-    if not entries:
+    all_entries = parse_prompts(PROMPTS_FILE)
+    if not all_entries:
         print("ERROR: No prompts found in", PROMPTS_FILE)
         sys.exit(1)
 
-    print(f"Found {len(entries)} prompts. Starting generation...\n")
+    step_filter = parse_steps(args.steps)
+    entries = filter_entries(all_entries, args.exercise, step_filter)
+
+    if not entries:
+        print("No entries match the given --exercise / --steps filter.")
+        sys.exit(0)
+
+    # Summary of what will be generated
+    ex_label = args.exercise if args.exercise != "all" else "all exercises"
+    step_label = args.steps if args.steps else "all steps"
+    print(f"Exercise : {ex_label}")
+    print(f"Steps    : {step_label}")
+    print(f"Overwrite: {'yes' if args.overwrite else 'no'}")
+    print(f"Matched  : {len(entries)} image(s)\n")
 
     success = 0
     failed = []
@@ -149,10 +260,13 @@ def main() -> None:
         aspect   = entry["aspect"]
         out_path = OUTPUT_DIR / filename
 
-        if out_path.exists():
+        if out_path.exists() and not args.overwrite:
             print(f"[{i:03d}/{len(entries)}] SKIP  {filename}  (already exists)")
             success += 1
             continue
+
+        if out_path.exists() and args.overwrite:
+            out_path.unlink()
 
         print(
             f"[{i:03d}/{len(entries)}] GEN   {filename} [{aspect}] ...",
