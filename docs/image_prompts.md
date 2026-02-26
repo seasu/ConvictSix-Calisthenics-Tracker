@@ -180,18 +180,28 @@ downward. Landscape 16:9, figure centred.
 
 ### pushUp_09_sq.jpg — 槓桿推 Lever Push-up (方形)
 ```
-Figure with one hand planted directly under the chest and the other arm
-fully extended sideways resting on a round ball, performing a deep
-one-sided push-up, body at an extreme lateral tilt. Front-angled view.
-Orange accent on the working shoulder. Square 1:1, figure centred.
+Figure performing a lever push-up at the bottom position, chest barely one
+fist above the floor. The working arm is BENT at the elbow, hand flat on
+the floor directly under that shoulder, fingers spread wide, bearing full
+body weight. The other arm is COMPLETELY HORIZONTAL, extended straight out
+to the side at shoulder height, palm resting on top of a basketball sitting
+on the floor. Body is rigid and nearly parallel to the floor. Low 3/4 front
+angle view showing both arms clearly — the bent arm under the chest and the
+fully extended arm reaching sideways onto the ball. Orange glow on the bent
+working arm and shoulder. Square 1:1, figure centred.
 ```
 
 ### pushUp_09_ls.jpg — 槓桿推 Lever Push-up (橫式)
 ```
-Figure with one hand planted directly under the chest and the other arm
-fully extended sideways resting on a round ball, performing a deep
-one-sided push-up, body at an extreme lateral tilt. Front-angled view.
-Orange accent on the working shoulder. Landscape 16:9, figure centred.
+Figure performing a lever push-up at the bottom position, chest barely one
+fist above the floor. The working arm is BENT at the elbow, hand flat on
+the floor directly under that shoulder, fingers spread wide, bearing full
+body weight. The other arm is COMPLETELY HORIZONTAL, extended straight out
+to the side at shoulder height, palm resting on top of a basketball sitting
+on the floor. Body is rigid and nearly parallel to the floor. Low 3/4 front
+angle view showing both arms clearly — the bent arm under the chest and the
+fully extended arm reaching sideways onto the ball. Orange glow on the bent
+working arm and shoulder. Landscape 16:9, figure centred.
 ```
 
 ### pushUp_10_sq.jpg — 單手推 One-Arm Push-up (方形)
