@@ -1,10 +1,23 @@
 name: Generate Exercise Images
 
 # Manually triggered from the Actions tab.
-# Requires GEMINI_API_KEY to be set in repo Settings → Secrets → Actions.
+#
+# Provider credentials (set in repo Settings → Secrets → Actions):
+#   gemini      → GEMINI_API_KEY
+#   huggingface → HF_TOKEN          (free at huggingface.co/settings/tokens)
+#   pollinations → (no secret needed, completely free)
 on:
   workflow_dispatch:
     inputs:
+      provider:
+        description: 'Image generation provider'
+        required: false
+        default: 'pollinations'
+        type: choice
+        options:
+          - pollinations
+          - huggingface
+          - gemini
       exercise:
         description: 'Exercise to generate (all = every exercise)'
         required: false
@@ -38,7 +51,7 @@ permissions:
 jobs:
   generate:
     name: >-
-      Generate
+      [${{ github.event.inputs.provider }}]
       ${{ github.event.inputs.exercise == 'all' && 'all exercises' || github.event.inputs.exercise }}
       ${{ github.event.inputs.steps != '' && format('steps {0}', github.event.inputs.steps) || '(all steps)' }}
     runs-on: ubuntu-latest
@@ -58,10 +71,12 @@ jobs:
       - name: Generate images
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_TOKEN:       ${{ secrets.HF_TOKEN }}
         run: |
           python3 scripts/generate_images.py \
-            --exercise "${{ github.event.inputs.exercise }}" \
-            --steps    "${{ github.event.inputs.steps }}" \
+            --provider  "${{ github.event.inputs.provider }}" \
+            --exercise  "${{ github.event.inputs.exercise }}" \
+            --steps     "${{ github.event.inputs.steps }}" \
             ${{ github.event.inputs.overwrite == 'yes' && '--overwrite' || '' }}
 
       - name: Commit and push generated images
@@ -73,11 +88,12 @@ jobs:
             echo "No new images to commit."
           else
             COUNT=$(git diff --cached --name-only | wc -l)
+            PROVIDER="${{ github.event.inputs.provider }}"
             EXERCISE="${{ github.event.inputs.exercise }}"
             STEPS="${{ github.event.inputs.steps }}"
-            MSG="Generate ${COUNT} images"
+            MSG="Generate ${COUNT} images via ${PROVIDER}"
             [ "$EXERCISE" != "all" ] && MSG="${MSG} [${EXERCISE}]"
             [ -n "$STEPS" ] && MSG="${MSG} steps ${STEPS}"
-            git commit -m "${MSG} via Gemini Imagen"
+            git commit -m "${MSG}"
             git push
           fi
