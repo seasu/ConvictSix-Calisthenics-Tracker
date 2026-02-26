@@ -318,18 +318,24 @@ direction. Landscape 16:9, figure centred.
 
 ### squat_05_sq.jpg — 標準深蹲 Full Squat (方形)
 ```
-Figure in a full deep squat with thighs at or below parallel, back straight,
-arms extended forward, feet shoulder-width apart with toes angled slightly
-out. Side view. Orange arrows at the hips curve upward. Square 1:1,
-figure centred.
+Figure at the bottom of a full squat viewed from the FRONT: feet
+shoulder-width apart, toes turned slightly outward, heels flat on the floor.
+Arms CROSSED over the chest (not extended forward). Squatted all the way
+down — hamstrings pressing against calves, hips below the knees, back as
+upright as possible. Front view clearly showing the crossed arms,
+outward-angled toes, and the full squat depth. Orange arrows at the hips
+point upward. Square 1:1, figure centred.
 ```
 
 ### squat_05_ls.jpg — 標準深蹲 Full Squat (橫式)
 ```
-Figure in a full deep squat with thighs at or below parallel, back straight,
-arms extended forward, feet shoulder-width apart with toes angled slightly
-out. Side view. Orange arrows at the hips curve upward. Landscape 16:9,
-figure centred.
+Figure at the bottom of a full squat viewed from the FRONT: feet
+shoulder-width apart, toes turned slightly outward, heels flat on the floor.
+Arms CROSSED over the chest (not extended forward). Squatted all the way
+down — hamstrings pressing against calves, hips below the knees, back as
+upright as possible. Front view clearly showing the crossed arms,
+outward-angled toes, and the full squat depth. Orange arrows at the hips
+point upward. Landscape 16:9, figure centred.
 ```
 
 ### squat_06_sq.jpg — 窄距深蹲 Close Squat (方形)
