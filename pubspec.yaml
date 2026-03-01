@@ -1,7 +1,7 @@
 name: convict_six_calisthenics_tracker
-description: Track your progress through the Convict Conditioning six-movement programme.
+description: Track your calisthenics progress through a six-movement, ten-step progression system.
 publish_to: 'none'
-version: 1.5.7+15
+version: 1.5.8+16
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

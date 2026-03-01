@@ -1,4 +1,4 @@
-/// The six movements (六招) of the Convict Conditioning programme.
+/// The six movements (六招) of the calisthenics progression system.
 enum ExerciseType {
   pushUp, // 伏地挺身
   squat, // 深蹲
