@@ -1,7 +1,6 @@
 import '../../data/models/exercise.dart';
 
 /// Complete definitions for all six exercises and their ten progression steps.
-/// Data sourced from Paul Wade's Convict Conditioning programme.
 const List<Exercise> kAllExercises = [
   _pushUps,
   _squats,

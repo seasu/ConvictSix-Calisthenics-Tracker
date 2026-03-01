@@ -178,7 +178,7 @@ class _ConceptPage extends StatelessWidget {
     return const _PageShell(
       emoji: '🏋️',
       title: '囚徒健身\n是什麼？',
-      body: '囚徒健身（Convict Conditioning）是 Paul Wade 在獄中研發的自重力量系統，以最純粹的動作模式，透過十個漸進步驟，從入門到菁英，塑造真實的功能性力量。',
+      body: '六式漸進自重訓練系統，以最純粹的動作模式，透過十個難度遞增的步驟，從入門到菁英，塑造真實的功能性力量。無需器材，以身體為器械。',
       extra: _BulletList(items: [
         '不依賴器材，身體即是器械',
         '關節友善，強化深層穩定肌',
@@ -504,6 +504,12 @@ class _TierList extends StatelessWidget {
               ),
             ],
           ),
+        ),
+        const SizedBox(height: 16),
+        const Text(
+          '本應用程式為非官方個人工具，與任何出版商或原著作者無關聯。',
+          style: TextStyle(fontSize: 11, color: kTextTertiary, height: 1.5),
+          textAlign: TextAlign.center,
         ),
       ],
     );
