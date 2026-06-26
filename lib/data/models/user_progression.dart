@@ -13,8 +13,9 @@ class UserProgression {
 
   int stepFor(ExerciseType type) => currentSteps[type] ?? 1;
 
-  /// Returns 0 (入門), 1 (中級), or 2 (晉級). Defaults to 2.
-  int trainingLevelFor(ExerciseType type) => trainingLevels[type] ?? 2;
+  /// Returns 0 (入門), 1 (中級), or 2 (晉級). Defaults to 0 so newcomers start
+  /// at the easiest standard and work up — a reachable, low-pressure goal.
+  int trainingLevelFor(ExerciseType type) => trainingLevels[type] ?? 0;
 
   UserProgression withStep(ExerciseType type, int step) {
     return UserProgression(
@@ -49,7 +50,7 @@ class UserProgression {
       final rawStep = json[type.name];
       steps[type] = (rawStep as int?)?.clamp(1, 10) ?? 1;
       final rawLevel = json['${type.name}_level'];
-      levels[type] = (rawLevel as int?)?.clamp(0, 2) ?? 2;
+      levels[type] = (rawLevel as int?)?.clamp(0, 2) ?? 0;
     }
     return UserProgression(
       currentSteps: Map.unmodifiable(steps),
@@ -63,7 +64,7 @@ class UserProgression {
         for (final type in ExerciseType.values) type: 1,
       }),
       trainingLevels: Map.unmodifiable({
-        for (final type in ExerciseType.values) type: 2,
+        for (final type in ExerciseType.values) type: 0,
       }),
     );
   }

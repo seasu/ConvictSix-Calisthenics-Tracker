@@ -158,6 +158,37 @@ class _ExerciseStepCard extends ConsumerWidget {
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: Colors.white70),
           ),
+          const SizedBox(height: 6),
+          // Next-step preview — keeps the immediate goal in sight
+          if (currentStep < 10)
+            Row(
+              children: [
+                const Icon(Icons.arrow_upward_rounded,
+                    size: 13, color: Colors.white38),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    '下一式：第 ${currentStep + 1} 式 · '
+                    '${exercise.stepAt(currentStep + 1).nameZh}',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: Colors.white38),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            )
+          else
+            Row(
+              children: [
+                const Text('🏆', style: TextStyle(fontSize: 13)),
+                const SizedBox(width: 4),
+                Text(
+                  '已達最高式',
+                  style: theme.textTheme.bodySmall
+                      ?.copyWith(color: theme.colorScheme.primary),
+                ),
+              ],
+            ),
           const SizedBox(height: 12),
           // Step slider
           SliderTheme(
@@ -257,10 +288,23 @@ class _ProgressionStandard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '訓練強度',
-            style: theme.textTheme.labelMedium
-                ?.copyWith(color: Colors.white54),
+          Row(
+            children: [
+              Text(
+                '今日目標',
+                style: theme.textTheme.labelMedium
+                    ?.copyWith(color: Colors.white54),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '· 達到「晉級」標準即可升上一式',
+                  style: theme.textTheme.labelSmall
+                      ?.copyWith(color: Colors.white30),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Row(

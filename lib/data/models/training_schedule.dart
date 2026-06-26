@@ -75,40 +75,25 @@ class TrainingSchedule {
     );
   }
 
-  /// Default: push+squat on Mon/Wed/Fri, pull+bridge+legRaise on Tue/Thu.
+  /// Default: the canonical Convict Conditioning "Good Behavior" routine —
+  /// three training days a week, two movements each. A deliberately light
+  /// minimum-effective-dose start that is easy to stick with.
+  ///   Mon  伏地挺身 + 舉腿
+  ///   Wed  引體向上 + 深蹲
+  ///   Fri  橋式 + 倒立推
   factory TrainingSchedule.defaultSchedule() {
     return const TrainingSchedule(days: [
       DaySchedule(
         weekday: 1,
-        exercises: [ExerciseType.pushUp, ExerciseType.squat],
-      ),
-      DaySchedule(
-        weekday: 2,
-        exercises: [
-          ExerciseType.pullUp,
-          ExerciseType.bridge,
-          ExerciseType.legRaise,
-        ],
+        exercises: [ExerciseType.pushUp, ExerciseType.legRaise],
       ),
       DaySchedule(
         weekday: 3,
-        exercises: [
-          ExerciseType.pushUp,
-          ExerciseType.squat,
-          ExerciseType.handstand,
-        ],
+        exercises: [ExerciseType.pullUp, ExerciseType.squat],
       ),
       DaySchedule(
         weekday: 5,
-        exercises: [ExerciseType.pushUp, ExerciseType.squat],
-      ),
-      DaySchedule(
-        weekday: 6,
-        exercises: [
-          ExerciseType.pullUp,
-          ExerciseType.bridge,
-          ExerciseType.legRaise,
-        ],
+        exercises: [ExerciseType.bridge, ExerciseType.handstand],
       ),
     ]);
   }
