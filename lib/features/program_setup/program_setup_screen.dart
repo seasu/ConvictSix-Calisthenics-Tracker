@@ -298,7 +298,9 @@ class _ProgressionStandard extends ConsumerWidget {
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
-                  '· 達到「晉級」標準即可升上一式',
+                  step.isMasterStep
+                      ? '· 已是最高式，挑戰大師標準'
+                      : '· 達到「晉級」標準即可升上一式',
                   style: theme.textTheme.labelSmall
                       ?.copyWith(color: Colors.white30),
                   overflow: TextOverflow.ellipsis,
@@ -335,7 +337,7 @@ class _ProgressionStandard extends ConsumerWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: _StandardChip(
-                  label: '晉級',
+                  label: step.isMasterStep ? '大師' : '晉級',
                   value: step.progression.display,
                   color: kTierAdvanced,
                   selected: currentLevel == 2,

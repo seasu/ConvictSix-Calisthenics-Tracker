@@ -447,7 +447,7 @@ class _StandardsRow extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: _StandardCard(
-            label: '晉級',
+            label: step.isMasterStep ? '大師標準' : '晉級',
             value: step.progression.display,
             color: tierColor,
           ),

@@ -100,6 +100,10 @@ class ExerciseStep {
   final StepStandard beginner;
   final StepStandard intermediate;
   final StepStandard progression; // graduation criterion
+
+  /// The final step has no step to graduate to — its top standard is the
+  /// "master" benchmark for the whole exercise, not a routine progression gate.
+  bool get isMasterStep => stepNumber == 10;
 }
 
 /// A full exercise definition containing all ten steps.
