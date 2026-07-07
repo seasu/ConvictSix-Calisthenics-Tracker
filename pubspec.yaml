@@ -1,7 +1,7 @@
 name: convict_six_calisthenics_tracker
 description: Track your calisthenics progress through a six-movement, ten-step progression system.
 publish_to: 'none'
-version: 1.6.0+18
+version: 1.7.0+19
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -13,14 +13,23 @@ dependencies:
   shared_preferences: ^2.3.2
   uuid: ^4.4.0
   intl: ^0.19.0
+  firebase_core: ^3.3.0
+  firebase_crashlytics: ^4.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
   mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.1
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/exercises/
+    - assets/app_icon.png
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/app_icon.png

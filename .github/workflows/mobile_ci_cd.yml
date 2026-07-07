@@ -1,0 +1,434 @@
+name: ConvictSix Mobile CI/CD
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: 'Release notes (optional, auto-generated if left blank)'
+        required: false
+        default: ''
+
+env:
+  FLUTTER_VERSION: '3.44.5'
+
+jobs:
+  # ─── Dart Analyze (fail-fast for every trigger) ────────────────────────────
+  dart-analyze:
+    name: Dart Analyze
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Dart analyze
+        run: dart analyze --fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+  # ─── Android Build (signed release APK/AAB) ────────────────────────────────
+  android-build:
+    name: Android Build
+    runs-on: ubuntu-latest
+    needs: dart-analyze
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
+      - name: Write google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON_ANDROID }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "❌ ERROR: GOOGLE_SERVICES_JSON_ANDROID secret is not set"
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          python3 -c "import json,sys; d=json.load(open('android/app/google-services.json')); assert 'project_info' in d, 'missing project_info'; p=d['project_info'].get('project_id',''); assert 'placeholder' not in p, 'placeholder project: '+p; print('OK project_id='+p)"
+
+      - name: Setup Android Release Signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "❌ ERROR: ANDROID_KEYSTORE_BASE64 secret is not set — release build must be signed"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/upload-keystore.jks
+          cat > android/key.properties <<EOF
+          storePassword=${STORE_PASSWORD}
+          keyPassword=${KEY_PASSWORD}
+          keyAlias=${KEY_ALIAS}
+          storeFile=../upload-keystore.jks
+          EOF
+          echo "✅ Release keystore configured"
+
+      # Play Store requires a strictly increasing versionCode on every upload.
+      # (github.run_number + 1000) keeps CI-issued codes clear of any past
+      # manually-set pubspec build numbers.
+      - name: Set versionCode = run_number + 1000
+        run: |
+          VER_NAME=$(grep '^version:' pubspec.yaml | awk '{print $2}' | cut -d'+' -f1)
+          VERSION_CODE=$(( ${{ github.run_number }} + 1000 ))
+          sed -i "s/^version:.*/version: ${VER_NAME}+${VERSION_CODE}/" pubspec.yaml
+          echo "✅ pubspec version: $(grep '^version:' pubspec.yaml | awk '{print $2}')"
+
+      - name: Build APK (release)
+        run: |
+          flutter build apk --release \
+            --split-per-abi \
+            --obfuscate \
+            --split-debug-info=build/symbols/android
+
+      - name: Build AAB (release)
+        run: |
+          flutter build appbundle --release \
+            --obfuscate \
+            --split-debug-info=build/symbols/android
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload mapping.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-mapping
+          path: build/app/outputs/mapping/release/mapping.txt
+
+      - name: Upload Android debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-symbols
+          path: build/symbols/android/
+          retention-days: 90
+
+  # ─── GitHub Release ─────────────────────────────────────────────────────────
+  release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    needs: android-build
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version from pubspec.yaml
+        id: ver
+        run: |
+          RAW=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          echo "raw=$RAW" >> "$GITHUB_OUTPUT"
+          echo "tag=v$RAW"  >> "$GITHUB_OUTPUT"
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+          path: dist/
+
+      - name: Rename APK with version
+        run: mv dist/app-arm64-v8a-release.apk "dist/ConvictSix-${{ steps.ver.outputs.raw }}.apk"
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: "ConvictSix ${{ steps.ver.outputs.raw }}"
+          body: |
+            ## 📦 ConvictSix Calisthenics Tracker `${{ steps.ver.outputs.raw }}`
+
+            ${{ github.event.inputs.release_notes != '' && github.event.inputs.release_notes || format('> Automated build · commit `{0}`', github.sha) }}
+
+            ### Install
+            1. Download `ConvictSix-*.apk` below
+            2. Enable "Install unknown apps" on your device
+            3. Tap the APK to install
+          files: "dist/ConvictSix-${{ steps.ver.outputs.raw }}.apk"
+          make_latest: true
+          fail_on_unmatched_files: true
+
+  # ─── Firebase App Distribution (Android) ───────────────────────────────────
+  firebase-distribute-android:
+    name: Firebase App Distribution (Android)
+    runs-on: ubuntu-latest
+    needs: android-build
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: android-apk
+
+      - name: Upload to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
+          serviceCredentialsFileContent: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          groups: testers
+          file: app-arm64-v8a-release.apk
+          releaseNotes: |
+            ${{ github.event.inputs.release_notes != '' && github.event.inputs.release_notes || github.ref_name }}
+
+  # NOTE: Google Play internal-track auto-upload is intentionally not wired up
+  # yet — the Play Console listing hasn't been created and a package can only
+  # be uploaded via the API after at least one manual upload. Once that first
+  # manual upload is done, add a job here modeled on Magic-Sticker's
+  # `play-store-deploy` job (r0adkll/upload-google-play@v1), download the
+  # `android-aab` + `android-mapping` artifacts produced above, and set
+  # `packageName: com.convictsix.calisthenics_tracker`.
+
+  # ─── iOS Build & TestFlight (parallel to android-build) ────────────────────
+  ios-build:
+    name: iOS Build & TestFlight
+    runs-on: macos-15
+    needs: dart-analyze
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode 26
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '26'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Configure iOS project
+        run: |
+          PBXPROJ="ios/Runner.xcodeproj/project.pbxproj"
+          # iOS deployment target
+          sed -i '' \
+            's/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*/IPHONEOS_DEPLOYMENT_TARGET = 15.0/g' \
+            "$PBXPROJ"
+          sed -i '' "s/# platform :ios, '[0-9.]*'/platform :ios, '15.0'/" ios/Podfile 2>/dev/null || true
+          sed -i '' "s/platform :ios, '[0-9.]*'/platform :ios, '15.0'/" ios/Podfile 2>/dev/null || true
+          # Use the GitHub run number as build number so every TestFlight
+          # upload is unique.
+          /usr/libexec/PlistBuddy \
+            -c "Set :CFBundleVersion ${{ github.run_number }}" \
+            ios/Runner/Info.plist 2>/dev/null || \
+          /usr/libexec/PlistBuddy \
+            -c "Add :CFBundleVersion string ${{ github.run_number }}" \
+            ios/Runner/Info.plist
+          echo "✅ Bundle: com.convictsix.calisthenics_tracker, iOS 15.0+, build=${{ github.run_number }}"
+
+      - name: Generate launcher icons
+        run: dart run flutter_launcher_icons
+
+      - name: Write GoogleService-Info.plist
+        env:
+          GOOGLE_SERVICE_INFO_PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        run: |
+          if [ -z "$GOOGLE_SERVICE_INFO_PLIST" ]; then
+            echo "❌ GOOGLE_SERVICE_INFO_PLIST secret is missing"
+            exit 1
+          fi
+          printf '%s' "$GOOGLE_SERVICE_INFO_PLIST" > ios/Runner/GoogleService-Info.plist
+          echo "✅ GoogleService-Info.plist written"
+
+      - name: Import Distribution Certificate
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+          echo "$CERTIFICATE_BASE64" | base64 --decode > $RUNNER_TEMP/certificate.p12
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$RUNNER_TEMP/certificate.p12" \
+            -P "$CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 \
+            -k "$KEYCHAIN_PATH"
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: \
+            -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          echo "✅ Distribution certificate imported"
+
+      - name: Install Provisioning Profile
+        env:
+          PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+        run: |
+          PP_PATH=$RUNNER_TEMP/profile.mobileprovision
+          echo "$PROVISIONING_PROFILE_BASE64" | base64 --decode > "$PP_PATH"
+          security cms -D -i "$PP_PATH" > /tmp/profile_decoded.plist
+          PP_UUID=$(/usr/libexec/PlistBuddy -c "Print :UUID" /tmp/profile_decoded.plist)
+          PP_NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile_decoded.plist)
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/"${PP_UUID}".mobileprovision
+          echo "PP_NAME=$PP_NAME" >> $GITHUB_ENV
+          echo "✅ Provisioning profile installed: $PP_NAME ($PP_UUID)"
+
+      - name: Configure Xcode Manual Signing
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          PBXPROJ="ios/Runner.xcodeproj/project.pbxproj"
+          sed -i '' 's/CODE_SIGN_STYLE = Automatic;/CODE_SIGN_STYLE = Manual;/g' "$PBXPROJ"
+          sed -i '' "s/DEVELOPMENT_TEAM = \"\";/DEVELOPMENT_TEAM = $APPLE_TEAM_ID;/g" "$PBXPROJ"
+          sed -i '' "s/DEVELOPMENT_TEAM = [A-Z0-9]*;/DEVELOPMENT_TEAM = $APPLE_TEAM_ID;/g" "$PBXPROJ"
+          if grep -q "PROVISIONING_PROFILE_SPECIFIER" "$PBXPROJ"; then
+            sed -i '' "s/PROVISIONING_PROFILE_SPECIFIER = .*;/PROVISIONING_PROFILE_SPECIFIER = \"$PP_NAME\";/g" "$PBXPROJ"
+          else
+            sed -i '' "s/CODE_SIGN_STYLE = Manual;/CODE_SIGN_STYLE = Manual;\n\t\t\t\tPROVISIONING_PROFILE_SPECIFIER = \"$PP_NAME\";/g" "$PBXPROJ"
+          fi
+          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "iPhone Developer";/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";/g' "$PBXPROJ"
+          sed -i '' 's/"CODE_SIGN_IDENTITY\[sdk=iphoneos\*\]" = "Apple Development";/"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";/g' "$PBXPROJ"
+          sed -i '' 's/CODE_SIGN_IDENTITY = "iPhone Developer";/CODE_SIGN_IDENTITY = "iPhone Distribution";/g' "$PBXPROJ"
+          sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PBXPROJ"
+          sed -i '' 's/CODE_SIGN_IDENTITY = "";/CODE_SIGN_IDENTITY = "Apple Distribution";/g' "$PBXPROJ"
+          echo "✅ Xcode project: Manual signing, team=$APPLE_TEAM_ID, profile=$PP_NAME"
+
+      - name: Create ExportOptions.plist
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          python3 - <<'PYEOF'
+          import plistlib, os
+          plist = {
+            'method': 'app-store',
+            'teamID': os.environ['APPLE_TEAM_ID'],
+            'signingStyle': 'manual',
+            'uploadBitcode': False,
+            'compileBitcode': False,
+            'uploadSymbols': True,
+            'provisioningProfiles': {
+              'com.convictsix.calisthenics_tracker': os.environ['PP_NAME']
+            }
+          }
+          with open('ios/ExportOptions.plist', 'wb') as f:
+            plistlib.dump(plist, f, fmt=plistlib.FMT_XML)
+          print('✅ ExportOptions.plist created (team:', os.environ['APPLE_TEAM_ID'], ')')
+          PYEOF
+
+      - name: Build IPA archive (no codesign)
+        run: |
+          flutter build ipa --release \
+            --no-codesign \
+            --obfuscate \
+            --split-debug-info=build/symbols/ios
+
+      - name: Sign archive
+        run: |
+          APP="build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app"
+          CERT=$(security find-identity -v -p codesigning | grep -E "iPhone Distribution|Apple Distribution" | head -1 | awk '{print $2}')
+          echo "🔏 Certificate: $CERT"
+          [ -z "$CERT" ] && echo "❌ No distribution certificate found" && exit 1
+          find "$APP/Frameworks" -name "*.framework" 2>/dev/null | while read f; do
+            codesign --force --sign "$CERT" --timestamp "$f" 2>/dev/null || true
+          done
+          codesign --force --sign "$CERT" --timestamp "$APP"
+          echo "✅ Archive signed"
+
+      - name: Export IPA with signing
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            -exportPath build/ios/ipa \
+            -exportOptionsPlist ios/ExportOptions.plist
+          echo "✅ IPA exported to build/ios/ipa/"
+
+      - name: Upload dSYMs to Firebase Crashlytics
+        continue-on-error: true
+        run: |
+          DSYM_DIR="build/ios/archive/Runner.xcarchive/dSYMs"
+          GSP_PATH="ios/Runner/GoogleService-Info.plist"
+          UPLOAD_SCRIPT=$(find ios/Pods/FirebaseCrashlytics -name "upload-symbols" 2>/dev/null | head -1)
+          if [ -z "$UPLOAD_SCRIPT" ]; then
+            echo "❌ upload-symbols not found, skipping dSYM upload"
+            exit 1
+          fi
+          find "$DSYM_DIR" -name "*.dSYM" | while read dsym; do
+            echo "⬆️  Uploading: $(basename "$dsym")"
+            "$UPLOAD_SCRIPT" -gsp "$GSP_PATH" -p ios "$dsym"
+          done
+          echo "✅ dSYMs uploaded to Firebase Crashlytics"
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-ipa
+          path: build/ios/ipa/*.ipa
+
+      - name: Upload iOS debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-debug-symbols
+          path: build/symbols/ios/
+          retention-days: 90
+
+      - name: Resolve IPA path
+        id: ipa
+        run: |
+          IPA_PATH=$(ls build/ios/ipa/*.ipa | head -1)
+          echo "path=$IPA_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload to TestFlight
+        uses: apple-actions/upload-testflight-build@v3
+        with:
+          app-path: ${{ steps.ipa.outputs.path }}
+          issuer-id: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          api-key-id: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          api-private-key: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+
+      - name: Upload iOS to Firebase App Distribution
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID_IOS }}
+          FIREBASE_SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_JSON }}
+          RELEASE_NOTES: ${{ github.event.inputs.release_notes != '' && github.event.inputs.release_notes || github.ref_name }}
+        run: |
+          npm install -g firebase-tools --quiet
+          SA_FILE=$RUNNER_TEMP/firebase-sa.json
+          printf '%s' "$FIREBASE_SA_JSON" > "$SA_FILE"
+          GOOGLE_APPLICATION_CREDENTIALS="$SA_FILE" \
+            firebase appdistribution:distribute "${{ steps.ipa.outputs.path }}" \
+              --app "$FIREBASE_APP_ID" \
+              --groups testers \
+              --release-notes "$RELEASE_NOTES"
+          rm -f "$SA_FILE"
+          echo "✅ iOS IPA uploaded to Firebase App Distribution"
