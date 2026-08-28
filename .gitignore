@@ -7,7 +7,16 @@
 .buildlog/
 .history
 
+# App project (not a package): pubspec.lock must be committed for
+# reproducible dependency versions, per CLAUDE.md convention.
+!pubspec.lock
 
+# IDE
+.idea/
+*.iml
+
+# Android signing
+*.keystore
 
 # Flutter repo-specific
 /bin/cache/

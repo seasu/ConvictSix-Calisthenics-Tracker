@@ -13,7 +13,7 @@ This file provides guidance for AI assistants (Claude Code, Copilot, etc.) worki
 
 **ConvictSix Calisthenics Tracker** is a cross-platform mobile (and optionally desktop/web) application built with Flutter/Dart. Its purpose is to help users track progress through a structured calisthenics programme (inspired by the "Convict Conditioning" / ConvictSix progression system), recording workouts, sets, reps, and advancement through exercise progressions.
 
-**Current state:** MVP scaffolding is complete. All six exercises with ten progression steps each are defined. The app supports setting your current level per exercise, scheduling weekly training days, logging workout sets/reps, and reviewing session history. Platform-specific host projects (android/, ios/, etc.) still need to be generated via `flutter create .`.
+**Current state:** MVP scaffolding is complete. All six exercises with ten progression steps each are defined. The app supports setting your current level per exercise, scheduling weekly training days, logging workout sets/reps, and reviewing session history. Android (`android/`) and iOS (`ios/`) host projects are generated and committed, with a signed-release CI/CD pipeline (see CI/CD section below).
 
 ---
 
@@ -28,7 +28,9 @@ This file provides guidance for AI assistants (Claude Code, Copilot, etc.) worki
 | Unique IDs | **uuid ^4.4.0** — v4 UUIDs for session and set IDs |
 | Date formatting | **intl ^0.19.0** — `DateFormat` with `zh_TW` locale |
 | Testing | flutter_test + **mocktail ^1.0.4** |
-| CI / Deployment | **GitHub Actions** — build + deploy to GitHub Pages on push to `main` |
+| Crash reporting | **firebase_core ^3.3.0** + **firebase_crashlytics ^4.1.0** — native (Android/iOS) only, disabled on web |
+| App icon | **flutter_launcher_icons ^0.14.1** — generates from `assets/app_icon.png` |
+| CI / Deployment | **GitHub Actions** — web build + deploy to GitHub Pages on push to `main`; signed Android/iOS builds + TestFlight + Firebase App Distribution via `mobile_ci_cd.yml` (see CI/CD section below) |
 
 **State management pattern:** `Notifier<T>` classes registered via `NotifierProvider`. All providers live in `lib/data/providers/app_providers.dart`. `SharedPreferences` is injected via a `Provider<SharedPreferences>` override at app startup.
 
@@ -78,15 +80,20 @@ ConvictSix-Calisthenics-Tracker/
 │           ├── exercise_progress_card.dart  # Full-width list card with tier colour + step dots
 │           ├── step_dots.dart               # StepDots (10-dot progress) + TierBadge widget
 │           └── set_log_tile.dart
-└── test/                                 # (to be populated)
-    ├── unit/
-    ├── widget/
-    └── integration/
+├── test/                                 # (to be populated)
+│   ├── unit/
+│   ├── widget/
+│   └── integration/
+├── assets/
+│   └── app_icon.png                      # Source image for flutter_launcher_icons (placeholder design)
+├── android/                               # Generated via `flutter create`; committed. applicationId com.convictsix.calisthenics_tracker
+│   └── app/google-services.json          # Placeholder committed; overwritten from GOOGLE_SERVICES_JSON_ANDROID secret in CI
+├── ios/                                   # Generated via `flutter create`; committed. Bundle ID com.convictsix.calisthenics_tracker
+│   └── Runner/GoogleService-Info.plist   # Placeholder committed; overwritten from GOOGLE_SERVICE_INFO_PLIST secret in CI
+└── .github/workflows/
+    ├── deploy-pages.yml                  # Web build → GitHub Pages
+    └── mobile_ci_cd.yml                  # Android + iOS signed build → GitHub Release, TestFlight, Firebase App Distribution
 ```
-
-> **Note:** Platform host projects (`android/`, `ios/`, etc.) are not yet present.
-> After cloning, run `flutter create . --project-name convict_six_calisthenics_tracker`
-> to generate them, then `flutter pub get`.
 
 ---
 
@@ -162,6 +169,53 @@ The workflow:
 5. Deploys `build/web/` to GitHub Pages
 
 All dependencies (`shared_preferences`, `uuid`, `intl`) are fully web-compatible. `HapticFeedback` silently no-ops on web.
+
+### Mobile CI/CD (Android + iOS)
+
+A GitHub Actions workflow (`.github/workflows/mobile_ci_cd.yml`) builds signed release
+artifacts on every push to `main`, on `v*` tags, and via manual `workflow_dispatch`.
+Modeled on the sibling Magic-Sticker project's `main_build.yml`, trimmed to what this
+app needs (no Google Sign-In, no ML Kit, no Play Store auto-upload yet).
+
+Jobs:
+1. **dart-analyze** — `flutter pub get`, `dart analyze --fatal-infos`, `flutter test`
+2. **android-build** — writes `google-services.json` from a secret, signs with a real
+   release keystore (also from secrets — there is no debug-signing fallback, a missing
+   keystore secret fails the build), builds `--split-per-abi` APK + AAB, uploads APK/AAB/
+   mapping.txt/debug-symbols as artifacts
+3. **ios-build** (macOS runner) — writes `GoogleService-Info.plist`, imports the Apple
+   Distribution certificate + provisioning profile, builds and signs the IPA, uploads
+   dSYMs to Crashlytics, uploads to TestFlight
+4. **release** — publishes the versioned APK to a GitHub Release
+5. **firebase-distribute-android** / iOS's Firebase upload step — pushes builds to
+   Firebase App Distribution (`testers` group)
+
+**Not yet wired up:** Google Play internal-track auto-upload. The Play Console listing
+doesn't exist yet and the API requires at least one manual upload first. Once that's
+done, add a `play-store-deploy` job copying Magic-Sticker's pattern
+(`r0adkll/upload-google-play@v1`, `packageName: com.convictsix.calisthenics_tracker`).
+
+**Required GitHub Secrets** (Settings → Secrets and variables → Actions):
+
+| Secret | Purpose |
+|---|---|
+| `ANDROID_KEYSTORE_BASE64` | base64-encoded upload keystore `.jks` |
+| `ANDROID_STORE_PASSWORD` / `ANDROID_KEY_ALIAS` / `ANDROID_KEY_PASSWORD` | keystore credentials |
+| `GOOGLE_SERVICES_JSON_ANDROID` | contents of the real Android `google-services.json` |
+| `GOOGLE_SERVICE_INFO_PLIST` | contents of the real iOS `GoogleService-Info.plist` |
+| `IOS_CERTIFICATE_BASE64` / `IOS_CERTIFICATE_PASSWORD` | Apple Distribution `.p12` cert |
+| `IOS_PROVISIONING_PROFILE_BASE64` | App Store provisioning profile |
+| `APPLE_TEAM_ID` | Apple Developer Team ID |
+| `APP_STORE_CONNECT_ISSUER_ID` / `APP_STORE_CONNECT_KEY_ID` / `APP_STORE_CONNECT_API_KEY` | App Store Connect API key for TestFlight upload |
+| `FIREBASE_APP_ID_ANDROID` / `FIREBASE_APP_ID_IOS` | Firebase App Distribution app IDs |
+| `FIREBASE_SERVICE_ACCOUNT_JSON` | Firebase service account for App Distribution + dSYM upload |
+
+`android/app/google-services.json` and `ios/Runner/GoogleService-Info.plist` are
+committed as structurally-valid **placeholders** (obvious fake project IDs) so local
+`flutter pub get`/`flutter build` don't fail — CI always overwrites them from the
+secrets above before building, and fails fast if the placeholder string is still
+present. `assets/app_icon.png` is likewise a placeholder (dark background, orange "6",
+tier-coloured step dots) pending real branding.
 
 ### Version Bumping
 

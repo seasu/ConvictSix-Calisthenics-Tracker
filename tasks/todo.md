@@ -4,6 +4,30 @@ Current and completed tasks. Updated each session.
 
 ---
 
+## Session 2026-07-07 — Android/iOS CI/CD + Firebase Crashlytics（參考 Magic-Sticker）
+
+### Plan
+- [x] 安裝 Flutter SDK 到 /opt/flutter（環境內原本沒有工具鏈）
+- [x] `flutter create --platforms=android,ios --org com.convictsix .` 產生並提交 android/ ios/
+- [x] applicationId / bundle ID 統一為 com.convictsix.calisthenics_tracker
+- [x] 加入 firebase_core + firebase_crashlytics，main.dart 接上全域錯誤處理（僅 native，web 跳過）
+- [x] 產出 assets/app_icon.png 佔位圖示（沿用 kBgBase/kPrimary/tier 色票）+ flutter_launcher_icons 設定
+- [x] android/app/build.gradle.kts、settings.gradle.kts 接上 Firebase Gradle plugin + release keystore 簽章
+- [x] 建立 google-services.json / GoogleService-Info.plist 佔位檔（CI 用 secret 覆寫）
+- [x] 新增 .github/workflows/mobile_ci_cd.yml：dart-analyze → android-build（簽章 APK/AAB）→ GitHub Release + Firebase App Distribution；ios-build（TestFlight + Firebase App Distribution）
+- [x] CLAUDE.md 補上 Firebase 技術棧、repo layout、CI/CD 章節與所需 GitHub Secrets 清單
+- [x] 版本 bump v1.6.0 → v1.7.0（+18 → +19）
+
+### Outcome
+比對 Magic-Sticker 的 main_build.yml 架構後裁減：ConvictSix 沒有帳號系統/Google Sign-In/
+ML Kit，所以不需要 REVERSED_CLIENT_ID 注入與 Sign-in-with-Apple entitlement 檢查。使用者
+確認尚未建立 Play Console 上架資料，因此 Play Store 自動上傳先不接（workflow 內留了說明
+如何比照 Magic-Sticker 補上）。本地驗證：`dart analyze --fatal-infos` 0 issue、
+`flutter test` 全過、以本地 Gradle 8.14.3 嘗試 evaluate build.gradle.kts / settings.gradle.kts
+確認語法正確（實際卡在 sandbox 環境無法下載 GitHub release 版的 Gradle 9.1.0，非設定檔問題，
+GitHub Actions runner 上不會有此限制）。web 版 CI（deploy-pages.yml）未受影響，Firebase 初始化
+用 `kIsWeb` 排除。
+
 ## Session 2026-06-26 — 精簡訓練規劃以提升持續率
 
 ### Plan
