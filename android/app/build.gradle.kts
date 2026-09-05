@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         applicationId = "com.convictsix.calisthenics_tracker"
-        minSdk = flutter.minSdkVersion
+        minSdk = 24 // camera + ML Kit Pose Detection 需求
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

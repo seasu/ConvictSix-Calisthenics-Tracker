@@ -68,5 +68,7 @@
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+	<string>用於動作偵測實驗室，即時計算運動次數</string>
 </dict>
 </plist>

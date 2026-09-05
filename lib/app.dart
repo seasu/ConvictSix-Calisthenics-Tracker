@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/history/history_screen.dart';
 import 'features/home/home_screen.dart';
 import 'features/intro/intro_screen.dart';
+import 'features/motion_lab/motion_lab_screen.dart';
 import 'features/program_setup/program_setup_screen.dart';
 import 'features/workout/workout_screen.dart';
 import 'shared/theme/app_theme.dart';
@@ -19,9 +20,7 @@ class ConvictSixApp extends StatelessWidget {
       title: 'ConvictSix Tracker',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      home: showIntro
-          ? const IntroScreen()
-          : const MainNavigationScreen(),
+      home: showIntro ? const IntroScreen() : const MainNavigationScreen(),
     );
   }
 }
@@ -34,11 +33,15 @@ class MainNavigationScreen extends ConsumerStatefulWidget {
       _MainNavigationScreenState();
 }
 
-class _MainNavigationScreenState
-    extends ConsumerState<MainNavigationScreen> {
+class _MainNavigationScreenState extends ConsumerState<MainNavigationScreen> {
   int _currentIndex = 0;
 
-  static const List<Widget> _screens = [
+  // IndexedStack keeps every child mounted so switching tabs preserves state
+  // (e.g. an active workout session). MotionLabScreen is deliberately kept
+  // out of it and built on demand instead — it owns a camera, which must
+  // not start until the tab is actually opened and must be released the
+  // moment the user leaves it.
+  static const List<Widget> _mainScreens = [
     HomeScreen(),
     WorkoutScreen(),
     HistoryScreen(),
@@ -48,10 +51,12 @@ class _MainNavigationScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
+      body: _currentIndex == _mainScreens.length
+          ? const MotionLabScreen()
+          : IndexedStack(
+              index: _currentIndex,
+              children: _mainScreens,
+            ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
@@ -74,6 +79,11 @@ class _MainNavigationScreenState
             icon: Icon(Icons.tune_outlined),
             activeIcon: Icon(Icons.tune),
             label: '計畫',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.science_outlined),
+            activeIcon: Icon(Icons.science),
+            label: '實驗室',
           ),
         ],
       ),

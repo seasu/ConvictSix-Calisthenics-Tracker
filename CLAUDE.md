@@ -30,6 +30,7 @@ This file provides guidance for AI assistants (Claude Code, Copilot, etc.) worki
 | Testing | flutter_test + **mocktail ^1.0.4** |
 | Crash reporting | **firebase_core ^3.3.0** + **firebase_crashlytics ^4.1.0** — native (Android/iOS) only, disabled on web |
 | App icon | **flutter_launcher_icons ^0.14.1** — generates from `assets/app_icon.png` |
+| Motion detection (experimental) | **camera ^0.12.1** + **google_mlkit_pose_detection ^0.16.1** — on-device pose detection, `lib/features/motion_lab/` only (see below) |
 | CI / Deployment | **GitHub Actions** — web build + deploy to GitHub Pages on push to `main`; signed Android/iOS builds + TestFlight + Firebase App Distribution via `mobile_ci_cd.yml` (see CI/CD section below) |
 
 **State management pattern:** `Notifier<T>` classes registered via `NotifierProvider`. All providers live in `lib/data/providers/app_providers.dart`. `SharedPreferences` is injected via a `Provider<SharedPreferences>` override at app startup.
@@ -69,8 +70,13 @@ ConvictSix-Calisthenics-Tracker/
 │   │   │   └── program_setup_screen.dart # Set current step + configure weekly schedule
 │   │   ├── workout/
 │   │   │   └── workout_screen.dart       # Start/log/finish a workout session
-│   │   └── history/
-│   │       └── history_screen.dart       # Past sessions list with expandable detail
+│   │   ├── history/
+│   │   │   └── history_screen.dart       # Past sessions list with expandable detail
+│   │   └── motion_lab/                   # EXPERIMENTAL — see "Motion Lab" section below
+│   │       ├── motion_lab_screen.dart    # Camera + live rep-count HUD, no persistence
+│   │       ├── pose_painter.dart         # Skeleton overlay CustomPainter
+│   │       ├── camera/                   # ML Kit/camera-specific glue (not unit-testable)
+│   │       └── detection/                # Pure Dart rep-counting logic (unit-testable)
 │   └── shared/
 │       ├── constants/
 │       │   └── exercises_data.dart       # Full 6×10 exercise definitions (Chinese + English)
@@ -216,6 +222,43 @@ committed as structurally-valid **placeholders** (obvious fake project IDs) so l
 secrets above before building, and fails fast if the placeholder string is still
 present. `assets/app_icon.png` is likewise a placeholder (dark background, orange "6",
 tier-coloured step dots) pending real branding.
+
+### Motion Lab (experimental — camera pose detection)
+
+`lib/features/motion_lab/` is a **self-contained, experimental validation feature**,
+reached via its own "實驗室" bottom-nav tab. It exists to answer one question: can
+on-device ML Kit pose detection reliably count reps from a phone camera? It is
+**not** part of the six-progression tracker and must stay that way until proven out:
+
+- **No persistence, no Riverpod provider.** State lives only in `MotionLabScreen`'s
+  own `State` and disappears when the screen closes.
+- **Does not read or write `WorkoutSession`/`WorkoutSet`** or any other app data.
+  A rep counted here never appears in training history.
+- **A different exercise list than the six progressions.** `MotionLabExercise` covers
+  squat, push-up, sit-up, jumping jack, high knee, and punch — picked for being easy
+  for a single static phone camera to frame, not for matching ConvictSix's six moves
+  (pull-up/leg-raise need a bar and go out of frame; bridge/handstand are hard for a
+  static camera to read reliably).
+- **Architecture:** `detection/` holds pure Dart rep-counting logic with zero
+  Flutter/camera/ML Kit dependency (`MoveDetector` per exercise + a shared
+  `HysteresisRepCounter` state machine) — fully unit-tested in
+  `test/unit/motion_lab/`. `camera/` holds the ML-Kit-specific glue
+  (`CameraImage` → `InputImage` conversion, ML Kit `Pose` → this app's own
+  `PoseFrame` type) that cannot be unit-tested and has **not been verified on real
+  hardware** — this dev environment has no camera. Threshold values in
+  `motion_lab_exercise.dart` are first guesses pending on-device calibration.
+- **Fully offline.** ML Kit Pose Detection bundles its model at build time on both
+  platforms (no Google Play Services download, no network call at runtime) — adds
+  roughly 10-13MB (Android) / 30-33MB (iOS) to app size.
+- Requires Android `minSdk 24` (raised from the Flutter default — see
+  `android/app/build.gradle.kts`) and iOS `IPHONEOS_DEPLOYMENT_TARGET 15.5` (raised
+  from 13.0 — see `project.pbxproj`), both driven by `camera`/`google_mlkit_pose_detection`'s
+  own minimums.
+
+**Do not** wire this feature's rep counts into `activeWorkoutProvider` or any
+gamification/RPG layer until a real-device test confirms the detection is accurate
+enough to be worth building on. That product decision comes after validation, not
+before.
 
 ### Version Bumping
 
